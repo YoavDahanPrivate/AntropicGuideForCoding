@@ -1,0 +1,9 @@
+{
+  "name": "antropic-guide-for-coding",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Working with Claude 5 models: 5 rules. A presentation for C/C++ real-time teams.",
+  "scripts": {
+    "start": "node serve.js"
+  }
+}

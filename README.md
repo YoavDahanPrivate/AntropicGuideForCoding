@@ -8,13 +8,24 @@ An engineering briefing for C/C++ real-time teams on Anthropic's guidance for pr
 |---|---|
 | [`index.html`](index.html) | The full presentation (39 slides) in one file. Animations and speaker notes are included. |
 | [`speaker-notes.md`](speaker-notes.md) | The speaker notes for every slide, as plain text. |
+| [`serve.js`](serve.js) | A tiny Node.js server that runs the deck locally (`npm start`). |
 | [`research/research-brief.md`](research/research-brief.md) | The research behind the deck: the five Anthropic sources, a summary of each, and further reading. |
 
 ## Presenting
 
-1. Download `index.html`, or clone the repo.
-2. Open it in Chrome, Edge or Firefox.
-3. Use these keys:
+**With Node.js** (no `npm install` needed, since there are no dependencies):
+
+```bash
+git clone https://github.com/YoavDahanPrivate/AntropicGuideForCoding.git
+cd AntropicGuideForCoding
+npm start
+```
+
+This serves the deck on http://localhost:8080 and opens it in your default browser. Press Ctrl+C to stop. To use another port, run `node serve.js 9000`. To skip opening the browser, add `--no-open`.
+
+**Without Node:** double-click `index.html`. It's a single self-contained file.
+
+Use these keys:
 
 | Key | Action |
 |---|---|
