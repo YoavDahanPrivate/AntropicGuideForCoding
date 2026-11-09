@@ -1,0 +1,1240 @@
+<!doctype html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Working with Claude 5 models: 5 rules</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;600&display=swap"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&display=swap"><style>
+html,body{margin:0;height:100%;background:#0B0D10;overflow:hidden}
+#stage{position:absolute;left:50%;top:50%;width:1920px;height:1080px;transform-origin:0 0}
+.slide{position:absolute;inset:0;display:none}
+.slide.on{display:block}
+section{position:relative;width:1920px;height:1080px;box-sizing:border-box;overflow:hidden}
+section *{margin:0;box-sizing:border-box}
+section h1{font-size:96px;font-weight:600;line-height:1.1}
+section h2{font-size:64px;font-weight:600;line-height:1.15}
+section h3{font-size:44px;font-weight:600;line-height:1.2}
+section p{font-size:32px;line-height:1.4}
+section ul,section ol{padding-left:1.3em}
+section table{border-collapse:collapse;width:100%}
+section th,section td{text-align:left;padding:14px 18px;border-bottom:1px solid #CFCABE;vertical-align:top}
+x-shape{display:block}
+x-shape[kind=arrow-right]{clip-path:polygon(0 35%,62% 35%,62% 0,100% 50%,62% 100%,62% 65%,0 65%)}
+x-icon{display:inline-block;flex:none;background:currentColor;-webkit-mask:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12.5l5 5L20 6.5' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 12.5l5 5L20 6.5' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat}
+[data-build-in]{opacity:0}
+.on [data-build-in].in{opacity:1;animation:bi .6s cubic-bezier(.2,.7,.2,1) backwards}
+.on [data-build-in].done{opacity:1;animation:none}
+.on [data-build-in^=rise].in{--f:translateY(40px)}
+.on [data-build-in^=left].in{--f:translateX(-40px)}
+.on [data-build-in^=scale].in{--f:scale(.92)}
+@keyframes bi{from{opacity:0;transform:var(--f,none)}to{opacity:1;transform:none}}
+#bar{position:fixed;left:0;right:0;bottom:0;display:flex;align-items:center;gap:14px;padding:8px 14px;font:13px system-ui,sans-serif;color:#B8BCC8;background:rgba(15,17,21,.85);opacity:0;transition:opacity .3s}
+body:hover #bar{opacity:1}
+#bar button{background:#22262E;color:#E9E6DE;border:1px solid #3A404B;border-radius:6px;padding:4px 10px;cursor:pointer;font:inherit}
+#bar .t{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#notes{position:fixed;left:0;right:0;bottom:44px;max-height:34vh;overflow:auto;padding:16px 22px;font:17px/1.5 system-ui,sans-serif;color:#E9E6DE;background:rgba(15,17,21,.95);border-top:1px solid #3A404B;display:none}
+body.shownotes #notes{display:block}
+</style></head><body><div id='stage'><div class="slide" data-title="Less scaffolding. Better engineering." data-note="The whole talk is on the right, as a diff, the format every engineer reads fluently. When the slide comes up it plays once: the old scaffolding lines turn into deletions, two lines of judgment are added, the stat bar shows minus eighty percent, and the evals line confirms no measurable loss. That is what Anthropic did to Claude Code’s own system prompt for the Claude 5 models. The diff is illustrative: the comment rule, the planning-docs rule and the replacement line are from Anthropic’s post; the rest stands in for the kind of rules that were removed. The five colours below are the five rules; each section of the deck uses its colour."><section id="cover" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:0px">
+<iframe style="position:absolute;left:1000px;top:180px;width:792px;height:720px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 792 720&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,CY=&#x27;#22D3EE&#x27;,GN=&#x27;#4ADE80&#x27;,RS=&#x27;#FB7185&#x27;,YE=&#x27;#FACC15&#x27;,VI=&#x27;#A78BFA&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;font-size:22px;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,c,p,x2){var e=el(&#x27;text&#x27;,{x:x,y:y,style:M+&#x27;fill:&#x27;+c+(x2||&#x27;&#x27;)},p);e.textContent=s;return e}
+function cl(v){return Math.max(0,Math.min(1,v))}
+function once(D,draw){draw(1);var st=0,raf=0;function step(n){if(!st)st=n;var t=Math.min(1,(n-st)/D);draw(t);if(t&lt;1)raf=requestAnimationFrame(step)}if(!window.IntersectionObserver)return;new IntersectionObserver(function(e){if(e[0].isIntersecting){st=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(step)}},{threshold:.5}).observe(document.body)}
+el(&#x27;rect&#x27;,{x:1,y:1,width:790,height:640,rx:12,fill:&#x27;#14171C&#x27;,stroke:DM,&#x27;stroke-width&#x27;:1.5});el(&#x27;rect&#x27;,{x:1,y:1,width:790,height:46,rx:12,fill:&#x27;#1A1E25&#x27;});el(&#x27;rect&#x27;,{x:1,y:34,width:790,height:13,fill:&#x27;#1A1E25&#x27;});
+[RS,YE,GN].forEach(function(c,i){el(&#x27;circle&#x27;,{cx:26+i*22,cy:24,r:7,fill:c,&#x27;fill-opacity&#x27;:.85})});tx(396,32,&#x27;git show --stat HEAD&#x27;,ST,0,&#x27;;text-anchor:middle&#x27;);
+tx(24,92,&#x27;commit 5a0c3e1&#x27;,YE);tx(250,92,&#x27;refactor(prompt): cut scaffolding&#x27;,B);
+tx(24,132,&#x27;system_prompt.md |&#x27;,B);var blk=[];for(var i=0;i&lt;10;i++)blk.push(el(&#x27;rect&#x27;,{x:290+i*26,y:114,width:20,height:22,fill:i&lt;8?RS:GN,&#x27;fill-opacity&#x27;:0}));var pct=tx(570,132,&#x27;−80%&#x27;,RS);
+el(&#x27;line&#x27;,{x1:24,y1:152,x2:768,y2:152,stroke:DM,&#x27;stroke-width&#x27;:1});tx(24,186,&#x27;@@ system_prompt.md @@&#x27;,CY);
+var L=[[&#x27;IMPORTANT: comments: one short line max&#x27;,&#x27;rm&#x27;],[&#x27;Don’t create planning docs unless asked&#x27;,&#x27;rm&#x27;],[&#x27;ALWAYS double-check your answer&#x27;,&#x27;rm&#x27;],[&#x27;Think step by step before every tool call&#x27;,&#x27;rm&#x27;],[&#x27;Example 1: when to use TodoWrite ...&#x27;,&#x27;rm&#x27;],[&#x27;Example 2: when NOT to use TodoWrite ...&#x27;,&#x27;rm&#x27;],[&#x27;Reminder: Read a file before you Edit it&#x27;,&#x27;rm&#x27;],[&#x27;Reminder: Read a file before you Edit it&#x27;,&#x27;rm&#x27;],[&#x27;Write code that reads like the surrounding&#x27;,&#x27;add&#x27;],[&#x27;code: match its comment density and idiom&#x27;,&#x27;add&#x27;]],R=[];
+L.forEach(function(l,i){var y=224+i*34,g=el(&#x27;g&#x27;,{});var band=el(&#x27;rect&#x27;,{x:10,y:y-24,width:772,height:32,fill:l[1]===&#x27;rm&#x27;?RS:GN,&#x27;fill-opacity&#x27;:0},g);var p=tx(24,y,&#x27; &#x27;,ST,g);var t=tx(52,y,l[0],B,g);var s=el(&#x27;line&#x27;,{x1:52,y1:y-7,x2:52,y2:y-7,stroke:RS,&#x27;stroke-width&#x27;:2},g);R.push({g:g,b:band,p:p,t:t,s:s,w:l[0].length*12.1,k:l[1],i:i})});
+var ev=el(&#x27;g&#x27;,{});tx(24,600,&#x27;coding evals&#x27;,ST,ev);el(&#x27;rect&#x27;,{x:200,y:584,width:120,height:14,fill:GN,&#x27;fill-opacity&#x27;:.55},ev);tx(200,622,&#x27;before&#x27;,ST,ev,&#x27;;font-size:18px&#x27;);el(&#x27;rect&#x27;,{x:340,y:584,width:120,height:14,fill:GN},ev);tx(340,622,&#x27;after&#x27;,ST,ev,&#x27;;font-size:18px&#x27;);tx(482,600,&#x27;no measurable loss&#x27;,GN,ev);
+var cap=tx(0,690,&#x27;Illustrative diff, based on Anthropic’s post on the 80% cut&#x27;,ST,0,&#x27;;font-size:22px&#x27;);
+once(7000,function(t){R.forEach(function(r){var i=r.i;if(r.k===&#x27;rm&#x27;){var k=cl((t-.02-i*.03)/.06),c=cl((t-.38-i*.028)/.06);r.g.setAttribute(&#x27;opacity&#x27;,k);r.p.textContent=c&gt;0?&#x27;-&#x27;:&#x27; &#x27;;r.p.style.fill=c&gt;0?RS:ST;r.t.style.fill=c&gt;0?RS:B;r.t.setAttribute(&#x27;opacity&#x27;,(1-.5*c).toFixed(2));r.s.setAttribute(&#x27;x2&#x27;,(52+r.w*c).toFixed(1));r.b.setAttribute(&#x27;fill-opacity&#x27;,(.08*c).toFixed(3))}else{var a=cl((t-.66-(i-8)*.05)/.07);r.g.setAttribute(&#x27;opacity&#x27;,a);r.p.textContent=&#x27;+&#x27;;r.p.style.fill=GN;r.t.style.fill=GN;r.b.setAttribute(&#x27;fill-opacity&#x27;,(.1*a).toFixed(3))}});
+var n=Math.round(10*cl((t-.55)/.2));blk.forEach(function(b,i){b.setAttribute(&#x27;fill-opacity&#x27;,i&lt;n?.9:0)});pct.setAttribute(&#x27;opacity&#x27;,cl((t-.72)/.06));ev.setAttribute(&#x27;opacity&#x27;,cl((t-.84)/.1))});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+<p data-build-in="fade 1 auto" style="position:absolute;left:128px;top:200px;width:820px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#22D3EE;font-weight:600">Engineering briefing · Claude 5 models</p>
+<h1 data-build-in="rise 2 auto" style="position:absolute;left:128px;top:260px;width:840px;font-family:'Space Grotesk', Arial, sans-serif;font-size:76px;font-weight:700;line-height:1.08;letter-spacing:-2px;color:#E9E6DE">Less scaffolding.<br>Better engineering.</h1>
+<p data-build-in="fade 3 auto" style="position:absolute;left:128px;top:470px;width:820px;font-size:28px;line-height:1.45;color:#B8BCC8">What this deck covers: five rules from Anthropic’s own guides for using Claude 5 models in large C/C++ codebases, each with a concrete example you can apply this week.</p>
+<div data-build-in="rise 4 auto" style="position:absolute;left:128px;top:700px;width:840px;display:flex;flex-direction:row;flex-wrap:wrap;gap:14px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;padding:8px 18px;border:2px solid #22D3EE;color:#E9E6DE">1 Prompting</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;padding:8px 18px;border:2px solid #A78BFA;color:#E9E6DE">2 Context</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;padding:8px 18px;border:2px solid #A3E635;color:#E9E6DE">3 Skills</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;padding:8px 18px;border:2px solid #FACC15;color:#E9E6DE">4 Effort</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;padding:8px 18px;border:2px solid #60A5FA;color:#E9E6DE">5 Agents</p>
+</div>
+
+</section>
+</div><div class="slide" data-title="why" data-note="This is the number that frames everything. Anthropic’s Claude Code team found they were over-constraining the model, and some instructions even contradicted each other. They cut more than 80% of the system prompt and their coding evals did not get worse. The bar on the right shows the cut: the grey is what they removed, the cyan is what stayed. It plays once when the slide appears. If Anthropic can delete most of its own prompt, most of us can delete a good chunk of our CLAUDE.md files, skills and agent setups too."><section id="why" data-transition="fade" style="background:radial-gradient(ellipse at 38% 45%, #F1EEE7 0%, #ECE9E1 55%, #D6D1C5 100%);color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<iframe style="position:absolute;left:1152px;top:430px;width:640px;height:220px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;
+html,body{margin:0;height:100%;background:transparent;overflow:hidden}
+#w{position:absolute;left:20px;right:20px;top:78px;height:64px;border-radius:12px;background:rgba(27,31,42,.08)}
+#f{position:absolute;left:0;top:0;bottom:0;width:100%;border-radius:12px;background:#7D838E;transition:width 2.4s cubic-bezier(.7,0,.2,1),background .8s ease}
+#f.cut{width:20%;background:#0E7490}
+#t{position:absolute;top:60px;bottom:60px;left:20%;width:3px;margin-left:20px;background:#0F1115;opacity:0;transition:opacity .6s ease 2.2s}
+#t.on{opacity:.6}
+.g{position:absolute;top:78px;height:64px;width:2px;background:rgba(251,250,247,.7)}
+&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;div id=&quot;w&quot;&gt;&lt;div id=&quot;f&quot;&gt;&lt;/div&gt;&lt;/div&gt;&lt;div id=&quot;t&quot;&gt;&lt;/div&gt;&lt;script&gt;
+var f=document.getElementById(&#x27;f&#x27;),t=document.getElementById(&#x27;t&#x27;);
+for(var i=1;i&lt;10;i++){var g=document.createElement(&#x27;div&#x27;);g.className=&#x27;g&#x27;;g.style.left=&#x27;calc(20px + &#x27;+(i*10)+&#x27;% - &#x27;+(i*4)+&#x27;px)&#x27;;document.body.appendChild(g);}
+f.classList.add(&#x27;cut&#x27;);t.classList.add(&#x27;on&#x27;);
+function run(){f.style.transition=&#x27;none&#x27;;t.style.transition=&#x27;none&#x27;;f.classList.remove(&#x27;cut&#x27;);t.classList.remove(&#x27;on&#x27;);void f.offsetWidth;f.style.transition=&#x27;&#x27;;t.style.transition=&#x27;&#x27;;setTimeout(function(){f.classList.add(&#x27;cut&#x27;);t.classList.add(&#x27;on&#x27;);},900);}
+if(window.IntersectionObserver)new IntersectionObserver(function(e){if(e[0].isIntersecting)run();},{threshold:.5}).observe(document.body);
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+<p data-build-in="rise 1 auto" style="position:absolute;left:128px;top:200px;width:1000px;font-size:44px;line-height:1.2;color:#50555F">Anthropic deleted</p>
+<p data-build-in="scale 2 auto" style="position:absolute;left:128px;top:250px;width:980px;font-family:'Space Grotesk', Arial, sans-serif;font-size:360px;font-weight:700;line-height:1;letter-spacing:-12px;color:#0E7490">80%</p>
+<p data-build-in="rise 3 auto" style="position:absolute;left:128px;top:640px;width:1000px;font-size:44px;line-height:1.25;font-weight:600;color:#0F1115">of Claude Code’s system prompt for Claude 5 models.</p>
+<p data-build-in="fade 4 auto" style="position:absolute;left:128px;top:800px;width:1000px;font-size:32px;line-height:1.4;color:#0F1115">Result on their coding evals: <b>no measurable loss.</b></p>
+
+</section>
+</div><div class="slide" data-title="One rule from each Anthropic guide" data-note="Here are all five rules, each with its own colour that carries through its section. Each comes from a separate Anthropic guide: the Opus 5.5 prompting guide, Thariq Shihipar’s post on context engineering, the skill authoring best practices, two posts on effort, and the Applied AI post on folding subagents into one agent. For each rule we’ll look at the principle and then a concrete example from a large C/C++ codebase."><section id="overview" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#50555F;font-weight:600">The five rules</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">One rule from each Anthropic guide</h2>
+<div data-build-in="rise 1 auto" style="position:absolute;left:128px;top:380px;width:312px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-top:8px solid #0E7490;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#0E7490">1</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Prompting</h3>
+<p style="font-size:24px;line-height:1.4;color:#50555F">Give the whole job in one message. Delete “double-check” lines.</p>
+</div>
+<div data-build-in="rise 2 auto" style="position:absolute;left:464px;top:380px;width:312px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-top:8px solid #6D28D9;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#6D28D9">2</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Context</h3>
+<p style="font-size:24px;line-height:1.4;color:#50555F">Short CLAUDE.md, mostly gotchas. No clashing rules.</p>
+</div>
+<div data-build-in="rise 3 auto" style="position:absolute;left:800px;top:380px;width:312px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-top:8px solid #4D7C0F;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#4D7C0F">3</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Skills</h3>
+<p style="font-size:24px;line-height:1.4;color:#50555F">SKILL.md is a table of contents. Load detail only on demand.</p>
+</div>
+<div data-build-in="rise 4 auto" style="position:absolute;left:1136px;top:380px;width:312px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-top:8px solid #A16207;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#A16207">4</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Effort</h3>
+<p style="font-size:24px;line-height:1.4;color:#50555F">Start at medium. Draft on low, verify on high.</p>
+</div>
+<div data-build-in="rise 5 auto" style="position:absolute;left:1472px;top:380px;width:320px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-top:8px solid #1D4ED8;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#1D4ED8">5</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Agents</h3>
+<p style="font-size:24px;line-height:1.4;color:#50555F">One agent plus skills. Subagents only for a measured reason.</p>
+</div>
+
+</section>
+</div><div class="slide" data-title="A good prompt says what Claude can’t infer" data-note="A prompt is plain English; there are no fields to fill in. The rule is to say what Claude can’t work out on its own. Two things are always worth stating: the symptom, and how you’ll know it’s fixed. One phrase is worth adding: reproduce it first. Anthropic’s effort tests show that without it Claude sometimes edits the code before running the reproducer, and then can’t show that the fix worked. Everything else is optional: where to look saves Claude a search in a large repo, and evidence such as a ticket or a log only helps if Claude can’t see it. The second prompt is the same request in a repo whose CLAUDE.md already lists the test commands: “fix and retest” is enough, because Claude knows what retest means there."><section id="sheet-prompting" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p style="position:absolute;left:128px;top:120px;width:1664px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#22D3EE;font-weight:600">Rule 1 · Prompting</p>
+<h2 style="position:absolute;left:128px;top:166px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">A good prompt says what Claude can’t infer</h2>
+<iframe style="position:absolute;left:128px;top:280px;width:1664px;height:470px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 1664 470&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,CY=&#x27;#22D3EE&#x27;,GN=&#x27;#4ADE80&#x27;,VI=&#x27;#A78BFA&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;font-size:26px;white-space:pre;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p){var e=el(&#x27;text&#x27;,{x:x,y:y,style:st},p);e.textContent=s;return e}
+function cl(v){return Math.max(0,Math.min(1,v))}
+function once(D,draw){draw(1);var st=0,raf=0;function step(n){if(!st)st=n;var t=Math.min(1,(n-st)/D);draw(t);if(t&lt;1)raf=requestAnimationFrame(step)}if(!window.IntersectionObserver)return;new IntersectionObserver(function(e){if(e[0].isIntersecting){st=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(step)}},{threshold:.5}).observe(document.body)}
+function box(y,h,title){el(&#x27;rect&#x27;,{x:0,y:y,width:1140,height:h,rx:10,fill:&#x27;#14171C&#x27;,stroke:DM,&#x27;stroke-width&#x27;:1.5});tx(24,y+34,title,F+&#x27;font-size:22px;fill:&#x27;+ST)}
+var HL=[],LN=[];
+function line(x,y,parts){var g=el(&#x27;g&#x27;,{}),hl=el(&#x27;g&#x27;,{},g),t=el(&#x27;text&#x27;,{x:x,y:y,style:M+&#x27;fill:&#x27;+B},g),xs=[];parts.forEach(function(p){var s=el(&#x27;tspan&#x27;,{},t);s.textContent=p[0];xs.push([s,p[1]])});
+var cx=x;xs.forEach(function(q){var w=q[0].getComputedTextLength();if(q[1]){var b=el(&#x27;rect&#x27;,{x:cx-3,y:y-24,width:w+6,height:32,rx:4,fill:q[1],&#x27;fill-opacity&#x27;:.16},hl),u=el(&#x27;rect&#x27;,{x:cx,y:y+6,width:w,height:3,fill:q[1]},hl);HL.push([b,u,q[0],q[1]])}cx+=w});LN.push(g)}
+box(0,250,&#x27;Bug fix, test commands not documented anywhere&#x27;);
+line(24,90,[[&#x27;&gt; &#x27;,0],[&#x27;Audio drops out after resume from suspend&#x27;,GN],[&#x27; &#x27;,0],[&#x27;(bug #4127, log attached)&#x27;,CY],[&#x27;.&#x27;,0]]);
+line(24,134,[[&#x27;  Look at &#x27;,0],[&#x27;on_resume() in src/rt/device.cpp&#x27;,CY],[&#x27;.&#x27;,0]]);
+line(24,178,[[&#x27;  &#x27;,0],[&#x27;Reproduce it with a test first&#x27;,VI],[&#x27;, then fix it.&#x27;,0]]);
+line(24,222,[[&#x27;  Done when &#x27;,0],[&#x27;ctest -L rt passes&#x27;,GN],[&#x27;.&#x27;,0]]);
+box(280,178,&#x27;Same bug, test commands already in CLAUDE.md&#x27;);
+line(24,370,[[&#x27;&gt; &#x27;,0],[&#x27;Audio drops out after resume from suspend&#x27;,GN],[&#x27;, see &#x27;,0],[&#x27;#4127&#x27;,CY],[&#x27;.&#x27;,0]]);
+line(24,414,[[&#x27;  &#x27;,0],[&#x27;Reproduce it with a test&#x27;,VI],[&#x27;, then &#x27;,0],[&#x27;fix and retest&#x27;,GN],[&#x27;.&#x27;,0]]);
+var LG=[];[[GN,&#x27;Required&#x27;,&#x27;the symptom, and how you’ll&#x27;,&#x27;know it’s fixed&#x27;],[VI,&#x27;Worth one phrase&#x27;,&#x27;reproduce it first, so the fix&#x27;,&#x27;can be shown to work&#x27;],[CY,&#x27;Only if Claude can’t infer it&#x27;,&#x27;where to look, evidence&#x27;,&#x27;outside the repo&#x27;]].forEach(function(r,i){var g=el(&#x27;g&#x27;,{}),y=20+i*130;el(&#x27;rect&#x27;,{x:1190,y:y,width:8,height:100,fill:r[0]},g);tx(1218,y+28,r[1],F+&#x27;font-size:26px;font-weight:700;fill:&#x27;+r[0],g);tx(1218,y+64,r[2],F+&#x27;font-size:23px;fill:&#x27;+B,g);tx(1218,y+94,r[3],F+&#x27;font-size:23px;fill:&#x27;+B,g);LG.push(g)});
+var note=tx(1190,440,&#x27;Plain English. No special syntax.&#x27;,F+&#x27;font-size:23px;fill:&#x27;+ST);
+once(7000,function(t){LN.forEach(function(g,i){var k=i&lt;4?cl((t-.02-i*.07)/.07):cl((t-.66-(i-4)*.07)/.07);g.setAttribute(&#x27;opacity&#x27;,k)});
+HL.forEach(function(h,i){var k=cl((t-.32-i*.035)/.06);h[0].setAttribute(&#x27;fill-opacity&#x27;,(.16*k).toFixed(3));h[1].setAttribute(&#x27;opacity&#x27;,k);h[2].style.fill=k&gt;.5?h[3]:B});
+LG.forEach(function(g,i){g.setAttribute(&#x27;opacity&#x27;,cl((t-.36-i*.08)/.07))});note.setAttribute(&#x27;opacity&#x27;,cl((t-.85)/.08))});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+<div style="position:absolute;left:128px;top:800px;width:1664px;display:flex;flex-direction:row;gap:40px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-top:4px solid #4ADE80;padding:18px 0px 0px 0px"><p style="font-size:30px;font-weight:600;color:#E9E6DE">Always: symptom + how to verify</p><p style="font-size:24px;line-height:1.4;color:#B8BCC8">Name the test command, unless CLAUDE.md already does.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-top:4px solid #22D3EE;padding:18px 0px 0px 0px"><p style="font-size:30px;font-weight:600;color:#E9E6DE">The rest only if it saves a search</p><p style="font-size:24px;line-height:1.4;color:#B8BCC8">Where to look, logs, tickets Claude can’t see.</p></div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;border-top:4px solid #FB7185;padding:18px 0px 0px 0px"><p style="font-size:30px;font-weight:600;color:#E9E6DE">No “double-check” lines</p><p style="font-size:24px;line-height:1.4;color:#B8BCC8">The test run is the check. Extra lines add cost, not quality.</p></div>
+</div>
+
+</section>
+</div><div class="slide" data-title="Brief Claude like a brilliant new hire, then let it run" data-note="The prompting guide says Claude 5 models do best when they get the complete task up front and are left to run. If you feed the job one step at a time, Claude only ever knows the next step and you end up babysitting. Spend your words on what a capable new hire couldn’t guess: your client, your numbers, your conventions. And delete the double-check and think-carefully lines. They made sense for older models, but now they just add cost and latency. For ambiguous work, ask Claude to interview you first."><section id="prompting" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 1 · Prompting</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Brief Claude like a brilliant new hire,<br>then let it run</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">One message, five parts</h3>
+<ol style="font-size:32px;line-height:1.5;color:#0F1115">
+<li>The goal</li>
+<li>Who it’s for</li>
+<li>What good looks like</li>
+<li>The inputs</li>
+<li>When it’s done</li>
+</ol>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#0F1115;padding:48px;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600;color:#22D3EE">Delete these lines</h3>
+<p style="font-size:44px;line-height:1.25;font-weight:600;color:#ECE9E1">“Double-check your answer.”<br>“Think carefully.”</p>
+<p style="font-size:24px;line-height:1.45;color:#B8BCC8">Claude already checks its own work. Anthropic says these lines add cost without improving results; removing one made replies start sooner.</p>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="One bug, two prompts" data-note="Rule one on a real C++ bug. The vague prompt makes Claude guess everything. The complete brief names the symptom, the file and function, asks for a failing test first, and defines done as ctest -L rt passing. That last part matters most in a large codebase: Claude can verify its own work instead of declaring victory. And if Claude stops before the tests pass, you don’t retype the task: it’s already in the conversation, so a goal with just the end condition keeps Claude working turn after turn until it holds. The next slide explains exactly how that works and when you should not use it."><section id="ex-prompting" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 1 · Example in a C/C++ repo</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">One bug, two prompts</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="width:520px;display:flex;flex-direction:column;gap:20px;background:#DEDAD0;padding:40px;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#BE123C">Vague</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;line-height:1.5;color:#0F1115">&gt; fix the audio dropout</p>
+<p style="font-size:24px;line-height:1.45;color:#50555F">Claude has to guess the symptom, where to look, and what “fixed” means.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#0F1115;padding:40px;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#22D3EE">Complete brief</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;line-height:1.5;color:#E9E6DE">&gt; audio drops out after resume from suspend. look at on_resume() in src/rt/device.cpp, write a failing test in tests/rt that reproduces it, then fix it. run ctest -L rt after and keep going until it passes.</p>
+<div style="display:flex;flex-direction:row;gap:12px;flex-wrap:wrap">
+<p style="font-size:24px;padding:6px 18px;border:1px solid #22D3EE;border-radius:40px;color:#22D3EE">symptom</p>
+<p style="font-size:24px;padding:6px 18px;border:1px solid #22D3EE;border-radius:40px;color:#22D3EE">where to look</p>
+<p style="font-size:24px;padding:6px 18px;border:1px solid #22D3EE;border-radius:40px;color:#22D3EE">reproduce first</p>
+<p style="font-size:24px;padding:6px 18px;border:1px solid #4ADE80;border-radius:40px;color:#4ADE80">done = ctest passes</p>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:28px 40px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-size:28px;color:#50555F">Claude stopped before the tests pass? The task is already in the conversation, so the goal only needs the end condition:</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;color:#0F1115">/goal ctest -L rt passes, nothing in third_party/ changed, or stop after 20 turns</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">How /goal works, and when not to use it: next slide. Source: Claude Code docs, “Best practices” and “/goal”.</p>
+
+</section>
+</div><div class="slide" data-title="/goal: keep working until a condition holds" data-note="Slash goal turns your definition of done into a loop. You give it the task and when it’s done; Claude starts working; after every turn a small, fast model reads the conversation and decides whether the condition holds, isn’t there yet, or is impossible. The important detail: that evaluator doesn’t run commands or read files. It only sees what Claude surfaced in the conversation, so the condition has to be something Claude’s own output demonstrates, like a ctest summary. Always bound it with a turn limit. If the task is already in the conversation, for example Claude stopped with three tests still failing, the goal only needs the end condition. Use it for long work with a checkable end state, like a migration. Don’t use it for quick interactive edits, for vague conditions like “robust”, or when you need a hard guarantee: that’s what a Stop hook running the real check, or CI, is for."><section id="goal" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 1 · Command explained</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">/goal: keep working until a condition holds</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#0F1115;padding:36px 40px;border-radius:16px">
+<h3 style="font-size:28px;font-weight:600;color:#22D3EE">How it works</h3>
+<ol style="font-size:24px;line-height:1.45;color:#E9E6DE">
+<li>/goal &lt;task + when it’s done&gt; starts a turn; the text is Claude’s instruction.</li>
+<li>After each turn, a small fast model reads the conversation and judges: met, not yet, or impossible.</li>
+<li>It runs no commands and reads no files. Claude’s own output, such as the test log, must show the condition.</li>
+<li>Stops when met or impossible, or on /goal clear. Bound it with “or stop after 20 turns”.</li>
+</ol>
+</div>
+<div style="width:760px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#F5F3EE;padding:28px 36px;border:2px solid #15803D;border-radius:16px">
+<h3 style="font-size:26px;font-weight:600;color:#15803D">Use it for</h3>
+<ul style="font-size:24px;line-height:1.4;color:#0F1115"><li>API migrations: until every call site compiles and ctest passes</li><li>Splitting a big file until each part is under 800 lines</li><li>Burning down a failing test label until it’s green</li></ul>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#F5F3EE;padding:28px 36px;border:2px solid #BE123C;border-radius:16px">
+<h3 style="font-size:26px;font-weight:600;color:#BE123C">Avoid it for</h3>
+<ul style="font-size:24px;line-height:1.4;color:#0F1115"><li>Quick interactive edits: you rarely need it in-session</li><li>Conditions a log can’t show, like “make it robust”</li><li>Hard guarantees: use a Stop hook or CI that runs the check</li></ul>
+</div>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#DEDAD0;padding:24px 36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#15803D">good  /goal migrate src/rt from ring_buffer to spsc_ring; done when no call site uses ring_buffer and ctest -L rt passes, or stop after 30 turns</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#BE123C">bad   /goal make the audio path robust</p>
+<p style="font-size:24px;color:#50555F">Task already in the conversation, e.g. Claude stopped with failing tests? Then the end condition alone is enough: /goal ctest -L rt passes, or stop after 20 turns.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Claude Code docs, “/goal” and “Best practices”. Evaluator tokens are typically negligible; the main turns are the real cost.</p>
+
+</section>
+</div><div class="slide" data-title="/goal vs. “keep going” in a normal prompt" data-note="A fair question: why not just write “keep going until ctest passes” in a normal prompt? The difference is who decides the work is done. In a normal prompt, Claude decides as it ends its turn, and it can still stop early, with a progress summary or a “should I continue?”. Then the session waits for you. With /goal, the goal lives outside the conversation as a Stop hook: after every turn a separate small model checks the condition, and if it isn’t met, Claude Code starts the next turn on its own. For a bug fix you’re watching there is little difference. For a long job you walk away from, it’s the difference between coming back to a finished migration and coming back to “should I continue?”. There are two ways to run it. From a fresh start, the goal carries both the task and when it’s done. As a rescue, when Claude has stopped with failing tests, the task is already in the conversation, so the goal only needs the end condition. And remember: both still rely on a model reading the log. If you need a guarantee, use a Stop hook that actually runs ctest."><section id="goal-vs-prompt" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 1 · Command explained</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">/goal vs. “keep going” in a normal prompt</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:36px">
+<div style="width:900px;display:flex;flex-direction:column;gap:20px">
+<p style="font-size:28px;line-height:1.35;color:#0F1115">The difference is <b>who decides the work is done.</b></p>
+<table style="font-size:24px;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr style="background:#DEDAD0"><th style="width:28%"></th><th style="width:36%">Normal prompt</th><th style="width:36%">/goal</th></tr>
+<tr><td>Who checks “done”</td><td>Claude, as it ends its turn</td><td>A separate model, after every turn</td></tr>
+<tr><td>If Claude stops early</td><td>Waits for you</td><td style="color:#0E7490">Starts the next turn itself</td></tr>
+<tr><td>Typical span</td><td>One turn or a few</td><td>Many turns, often unattended</td></tr>
+<tr><td>Fits</td><td>Work you’re watching</td><td>Long jobs you walk away from</td></tr>
+</table>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#0F1115;padding:32px 36px;border-radius:16px">
+<h3 style="font-size:28px;font-weight:600;color:#22D3EE">How you run it</h3>
+<p style="font-size:24px;color:#B8BCC8">1 · Fresh start: task + when it’s done</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:22px;line-height:1.45;color:#E9E6DE">/goal migrate src/rt from ring_buffer to spsc_ring; done when no call site uses ring_buffer and ctest -L rt passes, or stop after 30 turns</p>
+<p style="font-size:24px;color:#B8BCC8">2 · Rescue: Claude stopped early</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:22px;line-height:1.45;color:#E9E6DE">&gt; Migrate src/rt from ring_buffer to spsc_ring.<br><span style="color:#7D838E">… Claude stops: 3 tests in tests/rt fail …</span><br>/goal ctest -L rt passes with 0 failures, or stop after 20 turns</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Both rely on a model reading the log. For a hard guarantee, use a Stop hook that runs ctest and blocks the stop. Source: Claude Code docs, “/goal”.</p>
+
+</section>
+</div><div class="slide" data-title="Two rules clash. One line of judgment replaces both." data-note="A real clash Anthropic found in Claude Code. The old system prompt said “leave documentation where appropriate”, a skill said “DO NOT add comments”, and both applied to the same line of code. Claude can usually work out what you meant, but it has to reason harder every time. The fix was not a third rule: Anthropic deleted both and put one line of judgment in Claude Code’s system prompt: write code that reads like the surrounding code. The panel on the right answers the obvious question, where does that line live? Not in your files, and not just in training. It’s part of Claude Code’s built-in system prompt, written by Anthropic and sent with every request, so you never add it. Your layer, CLAUDE.md, rules and skills, should only add real standards Claude can’t infer, such as a MISRA C++ rule set for the real-time code, and never competing style rules that recreate this clash."><section id="sheet-context" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p style="position:absolute;left:128px;top:120px;width:1664px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#A78BFA;font-weight:600">Rule 2 · Context · Clashes</p>
+<h2 style="position:absolute;left:128px;top:166px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">Two rules clash. One line of judgment replaces both.</h2>
+<iframe style="position:absolute;left:128px;top:280px;width:1664px;height:660px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 1664 660&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,CY=&#x27;#22D3EE&#x27;,GN=&#x27;#4ADE80&#x27;,RS=&#x27;#FB7185&#x27;,VI=&#x27;#A78BFA&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p){var e=el(&#x27;text&#x27;,{x:x,y:y,style:st+&#x27;;white-space:pre&#x27;},p);e.textContent=s;return e}
+function seg(x,y,parts,p){var e=el(&#x27;text&#x27;,{x:x,y:y,style:M+&#x27;font-size:24px;white-space:pre&#x27;},p);parts.forEach(function(s){var t=el(&#x27;tspan&#x27;,{fill:s[1]},e);t.textContent=s[0]});return e}
+function cl(v){return Math.max(0,Math.min(1,v))}
+function once(D,draw){draw(1);var st=0,raf=0;function step(n){if(!st)st=n;var t=Math.min(1,(n-st)/D);draw(t);if(t&lt;1)raf=requestAnimationFrame(step)}if(!window.IntersectionObserver)return;new IntersectionObserver(function(e){if(e[0].isIntersecting){st=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(step)}},{threshold:.5}).observe(document.body)}
+function arrow(x1,y1,x2,y2,c,p){el(&#x27;line&#x27;,{x1:x1,y1:y1,x2:x2,y2:y2,stroke:c,&#x27;stroke-width&#x27;:2},p);var a=Math.atan2(y2-y1,x2-x1);el(&#x27;polygon&#x27;,{points:[x2,y2,x2-13*Math.cos(a-.4),y2-13*Math.sin(a-.4),x2-13*Math.cos(a+.4),y2-13*Math.sin(a+.4)].join(&#x27;,&#x27;),fill:c},p)}
+function card(x,y,w,h,tag,tc,l1,l2,p){var g=el(&#x27;g&#x27;,{},p);el(&#x27;rect&#x27;,{x:x,y:y,width:w,height:h,rx:8,fill:&#x27;#14171C&#x27;,stroke:tc,&#x27;stroke-width&#x27;:1.5},g);tx(x+18,y+32,tag,M+&#x27;font-size:22px;fill:&#x27;+tc,g);tx(x+18,y+68,l1,F+&#x27;font-size:26px;fill:&#x27;+B,g);if(l2)tx(x+18,y+100,l2,F+&#x27;font-size:26px;fill:&#x27;+B,g);return g}
+var c1=card(0,0,420,116,&#x27;system prompt (old)&#x27;,CY,&#x27;Leave documentation&#x27;,&#x27;where appropriate.&#x27;),c2=card(470,0,420,116,&#x27;a skill&#x27;,VI,&#x27;DO NOT add&#x27;,&#x27;comments.&#x27;);
+var s1=el(&#x27;line&#x27;,{x1:14,y1:58,x2:14,y2:58,stroke:RS,&#x27;stroke-width&#x27;:3}),s2=el(&#x27;line&#x27;,{x1:484,y1:58,x2:484,y2:58,stroke:RS,&#x27;stroke-width&#x27;:3});
+var ar=el(&#x27;g&#x27;,{});arrow(210,118,370,168,ST,ar);arrow(680,118,520,168,ST,ar);
+var code=el(&#x27;g&#x27;,{});el(&#x27;rect&#x27;,{x:0,y:170,width:890,height:176,rx:8,fill:&#x27;#14171C&#x27;,stroke:DM,&#x27;stroke-width&#x27;:1.5},code);
+var cm=seg(22,210,[[&#x27;    &#x27;,B],[&#x27;// ???&#x27;,RS]],code);seg(22,248,[[&#x27;int &#x27;,CY],[&#x27;ring_push(Ring* r, Sample s) {&#x27;,B]],code);seg(22,286,[[&#x27;  if &#x27;,CY],[&#x27;(ring_full(r)) return -EAGAIN;&#x27;,B]],code);seg(22,324,[[&#x27;  ...&#x27;,ST]],code);
+var q=el(&#x27;g&#x27;,{},code);el(&#x27;rect&#x27;,{x:600,y:188,width:260,height:34,rx:17,fill:RS,&#x27;fill-opacity&#x27;:.15,stroke:RS,&#x27;stroke-width&#x27;:1.5},q);tx(730,212,&#x27;which rule wins?&#x27;,F+&#x27;font-size:22px;text-anchor:middle;fill:&#x27;+RS,q);
+var res=card(0,370,890,120,&#x27;Claude Code’s built-in system prompt (new)&#x27;,GN,&#x27;Write code that reads like the surrounding code:&#x27;,&#x27;match its comment density, naming and idiom.&#x27;);
+tx(0,540,&#x27;Fix: delete competing style rules from your files.&#x27;,F+&#x27;font-size:24px;fill:&#x27;+B);tx(0,576,&#x27;Find them with /doctor prompt-audit.&#x27;,F+&#x27;font-size:24px;fill:&#x27;+ST);
+var LY=el(&#x27;g&#x27;,{});tx(960,22,&#x27;WHERE THAT LINE LIVES&#x27;,M+&#x27;font-size:22px;letter-spacing:3px;fill:&#x27;+ST,LY);
+function layer(y,c,title,a,b,hl){var g=el(&#x27;g&#x27;,{},LY);el(&#x27;rect&#x27;,{x:960,y:y,width:704,height:150,rx:10,fill:hl?&#x27;#0F2A1A&#x27;:&#x27;#14171C&#x27;,stroke:c,&#x27;stroke-width&#x27;:hl?3:1.5},g);tx(988,y+44,title,F+&#x27;font-size:28px;font-weight:700;fill:&#x27;+c,g);tx(988,y+86,a,F+&#x27;font-size:24px;fill:&#x27;+B,g);tx(988,y+122,b,F+&#x27;font-size:24px;fill:&#x27;+B,g);return g}
+var L1=layer(40,ST,&#x27;Model training&#x27;,&#x27;Written by Anthropic. Following local&#x27;,&#x27;style is already the model’s default.&#x27;);
+var L2=layer(210,GN,&#x27;Claude Code system prompt&#x27;,&#x27;Written by Anthropic. Sent with every&#x27;,&#x27;request. You don’t add this line.&#x27;,1);
+var L3=layer(380,VI,&#x27;Your CLAUDE.md, rules, skills&#x27;,&#x27;Written by you. Add only real standards,&#x27;,&#x27;e.g. MISRA C++. Never competing style rules.&#x27;);
+var lk=el(&#x27;g&#x27;,{});arrow(894,430,956,290,GN,lk);
+once(8000,function(t){var a=cl(t/.07);c1.setAttribute(&#x27;opacity&#x27;,a);c2.setAttribute(&#x27;opacity&#x27;,cl((t-.04)/.07));ar.setAttribute(&#x27;opacity&#x27;,cl((t-.1)/.06));code.setAttribute(&#x27;opacity&#x27;,cl((t-.14)/.06));
+var k=cl((t-.3)/.08);s1.setAttribute(&#x27;x2&#x27;,(14+300*k).toFixed(1));s2.setAttribute(&#x27;x2&#x27;,(484+200*k).toFixed(1));c1.setAttribute(&#x27;opacity&#x27;,a*(1-.55*k));c2.setAttribute(&#x27;opacity&#x27;,cl((t-.04)/.07)*(1-.55*k));
+var g2=cl((t-.4)/.08);res.setAttribute(&#x27;opacity&#x27;,g2);cm.lastChild.textContent=g2&gt;.5?&#x27;// returns -EAGAIN when full&#x27;:&#x27;// ???&#x27;;cm.lastChild.setAttribute(&#x27;fill&#x27;,g2&gt;.5?ST:RS);q.setAttribute(&#x27;opacity&#x27;,cl((t-.2)/.05)*(1-g2));
+L1.setAttribute(&#x27;opacity&#x27;,cl((t-.56)/.07));L2.setAttribute(&#x27;opacity&#x27;,cl((t-.64)/.07));L3.setAttribute(&#x27;opacity&#x27;,cl((t-.72)/.07));lk.setAttribute(&#x27;opacity&#x27;,cl((t-.8)/.07))});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+
+</section>
+</div><div class="slide" data-title="Pages of examples vs. a precise interface" data-note="Bloat, made concrete. Top row is what Anthropic did inside Claude Code. TodoWrite is the built-in tool Claude uses to keep its own checklist while it works. Its description used to run to about nine thousand one hundred characters of when-to-use lists and worked examples; the excerpt is illustrative of that style, not the exact text. Today it’s one line, an enum of three statuses and one rule. Bottom row is the same move in a C++ repo. The old review skill pastes six past reviews: about 250 lines loaded on every run, and they quietly tell Claude which bugs matter, so it hunts for allocations and non-atomic indices because that’s what it was shown. The new skill splits two things the examples were mixing. What to look for goes into a rules file, .claude/rules/rt.md, RT-1 to RT-5, read only when needed. How to report is a four-line contract: file and line, rule ID, fix, and what to say when there’s nothing. Look at the output: the third finding is a mutex in the callback, a bug type no example showed, caught because it’s in the rules. And because the format is fixed, you can grep it or fail CI on any RT-1. One short example of the output format is fine; many examples of content act as a hidden scope limit."><section id="sheet-bloat" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p style="position:absolute;left:128px;top:120px;width:1664px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#A78BFA;font-weight:600">Rule 2 · Context · Bloat</p>
+<h2 style="position:absolute;left:128px;top:166px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">Pages of examples vs. a precise interface</h2>
+<iframe style="position:absolute;left:128px;top:262px;width:1664px;height:620px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 1664 620&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,GN=&#x27;#4ADE80&#x27;,RS=&#x27;#FB7185&#x27;,VI=&#x27;#A78BFA&#x27;,SG=&#x27;#F0E6A8&#x27;,CY=&#x27;#22D3EE&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p){var e=el(&#x27;text&#x27;,{x:x,y:y,style:st+&#x27;;white-space:pre&#x27;},p);e.textContent=s;return e}
+function seg(x,y,parts,p,fs){var e=el(&#x27;text&#x27;,{x:x,y:y,style:M+&#x27;font-size:&#x27;+(fs||22)+&#x27;px;white-space:pre&#x27;},p);parts.forEach(function(s){var t=el(&#x27;tspan&#x27;,{fill:s[1]},e);t.textContent=s[0]});return e}
+function cl(v){return Math.max(0,Math.min(1,v))}
+function once(D,draw){draw(1);var st=0,raf=0;function step(n){if(!st)st=n;var t=Math.min(1,(n-st)/D);draw(t);if(t&lt;1)raf=requestAnimationFrame(step)}if(!window.IntersectionObserver)return;new IntersectionObserver(function(e){if(e[0].isIntersecting){st=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(step)}},{threshold:.5}).observe(document.body)}
+function arrow(x1,y,x2,c,p){el(&#x27;line&#x27;,{x1:x1,y1:y,x2:x2-12,y2:y,stroke:c,&#x27;stroke-width&#x27;:3},p);el(&#x27;polygon&#x27;,{points:[x2,y,x2-16,y-9,x2-16,y+9].join(&#x27;,&#x27;),fill:c},p)}
+function box(x,y,w,h,c,label,p){el(&#x27;rect&#x27;,{x:x,y:y,width:w,height:h,rx:8,fill:&#x27;#14171C&#x27;,stroke:c,&#x27;stroke-width&#x27;:1.5},p);tx(x+20,y+32,label,M+&#x27;font-size:20px;fill:&#x27;+c,p)}
+/* row 1: TodoWrite */
+tx(0,22,&#x27;1 · IN CLAUDE CODE: the TodoWrite tool, which Claude uses to keep its own task checklist&#x27;,M+&#x27;font-size:21px;letter-spacing:1px;fill:&#x27;+VI);
+var A0=el(&#x27;g&#x27;,{});box(0,36,780,172,RS,&#x27;before · about 9,100 characters (excerpt, illustrative)&#x27;,A0);
+[&#x27;When to use this tool:&#x27;,&#x27;  - complex tasks with 3 or more steps ...&#x27;,&#x27;When NOT to use it: a single, trivial task ...&#x27;,&#x27;Example: user asks for a feature → ...  (many more)&#x27;].forEach(function(s,i){tx(20,98+i*27,s,M+&#x27;font-size:20px;fill:&#x27;+ST,A0)});
+var A1=el(&#x27;g&#x27;,{});arrow(790,122,872,B,A1);
+var A2=el(&#x27;g&#x27;,{});box(884,36,780,172,GN,&#x27;after · one line + an enum + one rule&#x27;,A2);
+seg(904,100,[[&#x27;description&#x27;,VI],[&#x27;: &#x27;,ST],[&#x27;&quot;Create and update a task list for the session&quot;&#x27;,SG]],A2,20);seg(904,138,[[&#x27;status&#x27;,VI],[&#x27;     : &#x27;,ST],[&#x27;pending | in_progress | completed&#x27;,B]],A2,20);seg(904,176,[[&#x27;rule&#x27;,VI],[&#x27;       : &#x27;,ST],[&#x27;only one task in_progress&#x27;,B]],A2,20);
+/* row 2: rt-review */
+tx(0,258,&#x27;2 · THE SAME MOVE IN YOUR REPO: an rt-review skill (illustrative)&#x27;,M+&#x27;font-size:21px;letter-spacing:1px;fill:&#x27;+VI);
+var B0=el(&#x27;g&#x27;,{});box(0,272,470,300,RS,&#x27;before · SKILL.md: 6 pasted reviews&#x27;,B0);
+[&#x27;Example review 1 (mixer.cpp):&#x27;,&#x27;  &quot;Line 142 resizes a vector&#x27;,&#x27;   in process() ...&quot;&#x27;,&#x27;Example review 2 (ring.h):&#x27;,&#x27;  &quot;read index is not atomic ...&quot;&#x27;,&#x27;Example review 3 ... 6 ...&#x27;].forEach(function(s,i){tx(20,334+i*28,s,M+&#x27;font-size:19px;fill:&#x27;+ST,B0)});
+tx(20,516,&#x27;~250 lines, loaded on every run.&#x27;,F+&#x27;font-size:20px;fill:&#x27;+RS,B0);tx(20,546,&#x27;Claude hunts for the bugs it was shown.&#x27;,F+&#x27;font-size:20px;fill:&#x27;+RS,B0);
+var B1=el(&#x27;g&#x27;,{});arrow(478,420,536,B,B1);
+var B2=el(&#x27;g&#x27;,{});box(544,272,560,300,GN,&#x27;after · SKILL.md: output contract&#x27;,B2);
+seg(564,336,[[&#x27;For each finding report:&#x27;,B]],B2,20);seg(564,364,[[&#x27;  file:line · RT-n · fix&#x27;,SG]],B2,20);seg(564,392,[[&#x27;Rules: &#x27;,B],[&#x27;.claude/rules/rt.md&#x27;,SG]],B2,20);seg(564,420,[[&#x27;If none: &#x27;,B],[&#x27;&quot;rt-review: 0 findings&quot;&#x27;,SG]],B2,20);
+el(&#x27;line&#x27;,{x1:564,y1:440,x2:1084,y2:440,stroke:DM,&#x27;stroke-width&#x27;:1.5,&#x27;stroke-dasharray&#x27;:&#x27;6 5&#x27;},B2);
+tx(564,470,&#x27;.claude/rules/rt.md · next slide&#x27;,M+&#x27;font-size:19px;fill:&#x27;+VI,B2);
+seg(564,502,[[&#x27;RT-1 &#x27;,CY],[&#x27;no allocation  &#x27;,B],[&#x27;RT-2 &#x27;,CY],[&#x27;no locks&#x27;,B]],B2,19);seg(564,530,[[&#x27;RT-3 &#x27;,CY],[&#x27;no I/O         &#x27;,B],[&#x27;RT-4 &#x27;,CY],[&#x27;bounded loops&#x27;,B]],B2,19);seg(564,558,[[&#x27;RT-5 &#x27;,CY],[&#x27;shared indices are atomic&#x27;,B]],B2,19);
+var C1=el(&#x27;g&#x27;,{});arrow(1112,420,1166,B,C1);
+var C2=el(&#x27;g&#x27;,{});box(1174,272,490,300,CY,&#x27;Claude’s output&#x27;,C2);
+var hl=el(&#x27;rect&#x27;,{x:1186,y:446,width:466,height:62,rx:6,fill:GN,&#x27;fill-opacity&#x27;:.1,stroke:GN,&#x27;stroke-width&#x27;:1},C2);
+seg(1194,334,[[&#x27;src/rt/mixer.cpp:142 · &#x27;,B],[&#x27;RT-1&#x27;,CY]],C2,19);tx(1194,358,&#x27;  move vector resize to prepare()&#x27;,M+&#x27;font-size:19px;fill:&#x27;+ST,C2);
+seg(1194,398,[[&#x27;src/rt/ring.h:57 · &#x27;,B],[&#x27;RT-5&#x27;,CY]],C2,19);tx(1194,422,&#x27;  make read_idx std::atomic&#x27;,M+&#x27;font-size:19px;fill:&#x27;+ST,C2);
+seg(1194,470,[[&#x27;src/rt/device.cpp:88 · &#x27;,B],[&#x27;RT-2&#x27;,CY]],C2,19);tx(1194,494,&#x27;  lock-free queue, not std::mutex&#x27;,M+&#x27;font-size:19px;fill:&#x27;+ST,C2);
+var bd=el(&#x27;g&#x27;,{},C2);tx(1194,532,&#x27;↑ no example showed a lock bug&#x27;,F+&#x27;font-size:19px;fill:&#x27;+GN,bd);
+tx(1194,558,&#x27;Fixed format: grep it, gate CI on RT-1.&#x27;,F+&#x27;font-size:19px;fill:&#x27;+B,C2);
+var cap=tx(0,610,&#x27;Examples anchor Claude to the cases you wrote.&#x27;,F+&#x27;font-size:23px;fill:&#x27;+RS),cap2=tx(544,610,&#x27;Contract + rules file: shorter, finds new cases, machine-readable.&#x27;,F+&#x27;font-size:23px;fill:&#x27;+GN);
+once(9000,function(t){A0.setAttribute(&#x27;opacity&#x27;,cl(t/.06)*(1-.45*cl((t-.2)/.06)));A1.setAttribute(&#x27;opacity&#x27;,cl((t-.12)/.05));A2.setAttribute(&#x27;opacity&#x27;,cl((t-.17)/.06));
+B0.setAttribute(&#x27;opacity&#x27;,cl((t-.32)/.06)*(1-.45*cl((t-.52)/.06)));B1.setAttribute(&#x27;opacity&#x27;,cl((t-.44)/.05));B2.setAttribute(&#x27;opacity&#x27;,cl((t-.48)/.06));C1.setAttribute(&#x27;opacity&#x27;,cl((t-.6)/.05));C2.setAttribute(&#x27;opacity&#x27;,cl((t-.64)/.06));
+var h=cl((t-.76)/.06);hl.setAttribute(&#x27;opacity&#x27;,h);bd.setAttribute(&#x27;opacity&#x27;,h);cap.setAttribute(&#x27;opacity&#x27;,cl((t-.84)/.06));cap2.setAttribute(&#x27;opacity&#x27;,cl((t-.9)/.06))});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+<p style="position:absolute;left:128px;top:902px;width:1664px;font-size:26px;line-height:1.45;color:#B8BCC8">Tell Claude the <span style="color:#4ADE80">shape of the answer</span> (the format, the allowed values, the edge cases) and put <i>what to look for</i> in a rules file. Few lines, and it covers cases no example showed.</p>
+
+</section>
+</div><div class="slide" data-title="One rules file. It loads when Claude opens real-time code." data-note="Here’s the full rules file, and exactly when Claude sees it. It lives in .claude/rules/rt.md. The green block at the top is YAML frontmatter, and it is the only thing that controls loading: a paths glob for C and C++ files under src/rt. The hash line below it is just a Markdown heading for readers. The body holds what Claude can’t infer about our project: what counts as the audio thread, what each rule ID means, the exceptions, our own building blocks, and what is not a finding. No C++ examples: Claude already knows push_back can allocate. On the right, four prompts in a session started at the repo root. Fixing a Python tool never touches a matching file, so the rules never load and cost nothing. Debugging the audio dropout, Claude reads device.cpp: the rules load at that moment and stay in context for the rest of the session. Running the review skill on mixer.cpp also opens a matching file, so the rules load, and the skill’s output contract points to this same file, so there’s one source of truth. Just asking what’s in src/rt lists the folder but opens nothing, so the rules aren’t loaded yet. And if you leave out the paths field entirely, the file loads at launch in every session, exactly like CLAUDE.md."><section id="rt-rules" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 130px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#A78BFA;font-weight:600">Rule 2 · Context · The rules file</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:54px;font-weight:600;line-height:1.1;color:#E9E6DE">One rules file. It loads when Claude opens real-time code.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:36px">
+<div style="width:860px;display:flex;flex-direction:column;gap:12px;background:#14171C;padding:24px 30px;border:1px solid #3A404B;border-radius:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;color:#A78BFA">.claude/rules/rt.md</p>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:center;background:#0F2A1A;padding:10px 16px;border:2px solid #4ADE80;border-radius:8px">
+<p style="width:400px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;line-height:1.4;color:#E9E6DE">---<br>paths:<br>&nbsp;&nbsp;- "src/rt/**/*.{c,cc,cpp,h}"<br>---</p>
+<p style="flex:1;font-size:21px;line-height:1.35;color:#4ADE80">← This frontmatter controls loading. Nothing else in the file does.</p>
+</div>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;line-height:1.4;color:#E9E6DE"><span style="color:#7D838E"># Real-time rules</span>&nbsp;&nbsp;<span style="color:#50555F">(a heading, for readers only)</span><br>Audio thread = <span style="color:#F0E6A8">rt_callback()</span> and everything it calls.<br>A finding = code on the audio thread that breaks a rule.<br><br><span style="color:#22D3EE">RT-1</span> No heap allocation: new/malloc, vector/string growth,<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;allocating std::function or lambda captures.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:#4ADE80">Allowed in prepare() and constructors.</span><br><span style="color:#22D3EE">RT-2</span> No blocking locks (std::mutex, condition_variable).<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Hand data off via spsc_ring&lt;T,N&gt; (src/rt/ring.h).<br><span style="color:#22D3EE">RT-3</span> No I/O or syscalls: printf, std::cout, files.<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Log with rt_log(): lock-free, drained off-thread.<br><span style="color:#22D3EE">RT-4</span> Every loop has a fixed bound (constant or block_size).<br><span style="color:#22D3EE">RT-5</span> Shared indices are std::atomic: release / acquire.<br><br><span style="color:#7D838E">Not a finding: code off the audio thread, tests/, tools/.</span></p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;letter-spacing:3px;text-transform:uppercase;color:#7D838E">When does it load? Four prompts</p>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #7D838E;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#E9E6DE">&gt; fix the warning in tools/gen.py</p>
+<p style="font-size:20px;color:#B8BCC8">Claude edits tools/gen.py. <span style="color:#7D838E;font-weight:600">Not loaded:</span> no match.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#0F2A1A;padding:14px 20px;border-left:4px solid #4ADE80;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#E9E6DE">&gt; audio drops out after resume</p>
+<p style="font-size:20px;color:#B8BCC8">Claude reads src/rt/device.cpp. <span style="color:#4ADE80;font-weight:600">Loads now,</span> and stays in context for the rest of the session.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#0F2A1A;padding:14px 20px;border-left:4px solid #4ADE80;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#E9E6DE">&gt; /rt-review src/rt/mixer.cpp</p>
+<p style="font-size:20px;color:#B8BCC8">The skill opens mixer.cpp. <span style="color:#4ADE80;font-weight:600">Loads.</span> The skill’s contract points to this same file.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #7D838E;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#E9E6DE">&gt; what’s in src/rt?</p>
+<p style="font-size:20px;color:#B8BCC8">Claude only lists the folder. <span style="color:#7D838E;font-weight:600">Not yet:</span> opening a file is what counts.</p>
+</div>
+<p style="font-size:20px;line-height:1.4;color:#B8BCC8">No <span style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#F0E6A8">paths:</span> field? Then it loads at launch, every session, like CLAUDE.md.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:52px;width:1664px;font-size:21px;color:#7D838E">Trigger: Claude reads, writes or edits a matching file. Source: Claude Code docs, “How Claude remembers your project”. File contents are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="Four places. Each decides when the rules load." data-note="Where should the rules file live? The location decides when it loads. The recommendation is a path-scoped rule in .claude/rules with paths set to src/rt: it loads whenever Claude reads or edits real-time code, so it guides writing as well as reviewing. You can instead keep it inside the skill folder, where it’s read only when the review skill runs, which suits rules that only reviews need. A skill can also live in a folder’s own .claude/skills, so it’s offered once Claude works in that folder. To share across repositories, ship it as a plugin, or put it in your home .claude folder if it’s just for you. Two last points. Keep one copy: the skill’s contract points to the rules file rather than duplicating it. And there’s no per-model version: the rules describe our code, so the same file works whichever model runs."><section id="rt-rules-where" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:120px 128px 150px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:18px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#6D28D9;font-weight:600">Rule 2 · Context · Where the rules live</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:60px;font-weight:600;line-height:1.1;color:#0F1115">Four places. Each decides when the rules load.</h2>
+</div>
+<table style="font-size:23px;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr style="background:#DEDAD0"><th style="width:20%">Where</th><th style="width:34%">Path</th><th style="width:26%">Loads when</th><th style="width:20%">Good for</th></tr>
+<tr style="background:#DCEFE2"><td><b style="color:#15803D">Path rule (recommended)</b></td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px">.claude/rules/rt.md<br>paths: src/rt/**</td><td>Claude reads or edits a matching file</td><td>Guiding writing and reviewing</td></tr>
+<tr><td><b>Inside the skill</b></td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px">.claude/skills/rt-review/<br>reference/rt-rules.md</td><td>The skill runs and its SKILL.md points to it</td><td>Rules only reviews need</td></tr>
+<tr><td><b>Skill per folder</b></td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px">src/rt/.claude/skills/rt-review/</td><td>Skill is offered once Claude works in src/rt/</td><td>Skills that make no sense elsewhere</td></tr>
+<tr><td><b>Across repos</b></td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px">a plugin, or ~/.claude/ (just you)</td><td>Same triggers, in every repo that has it</td><td>Team-wide standards</td></tr>
+</table>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#F5F3EE;padding:24px 32px;border:1px solid #CFCABE;border-radius:14px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">One source of truth</p>
+<p style="font-size:22px;line-height:1.4;color:#50555F">Keep the rules in .claude/rules/rt.md. The review skill’s contract says “Rules: .claude/rules/rt.md”. No second copy to drift.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;background:#F5F3EE;padding:24px 32px;border:1px solid #CFCABE;border-radius:14px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">Not per model</p>
+<p style="font-size:22px;line-height:1.4;color:#50555F">The rules describe your code, not the model. The same file works whichever model runs the session.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:60px;width:1664px;font-size:22px;color:#50555F">Source: Claude Code docs, “How Claude remembers your project” and “Skills”. Paths are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="Six habits to drop, and what replaces them" data-note="A common question on this slide: do I need to write the right-hand column into my prompt? No. These are changes in how you write your files. Judgment is the model’s default behaviour on Claude 5; the old hard rules were overriding it, so you delete them and add nothing. The same goes for diary-style notes in CLAUDE.md: Claude Code’s auto-memory saves what’s relevant on its own. The other rows are things you do: describe interfaces precisely instead of pasting examples, move detail into skills and path-scoped rules so it only loads when needed, say each thing once, and point Claude at real headers and tests instead of writing prose specs."><section id="context" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#6D28D9;font-weight:600">Rule 2 · Context</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">Six habits to drop, and what replaces them</h2>
+</div>
+<p style="font-size:28px;line-height:1.4;color:#0F1115">You don’t add “use judgment” to your prompt. You delete the rule that was overriding it. <span style="color:#15803D">Green</span> = built in, nothing to write.</p>
+<table style="font-size:24px;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr style="background:#DEDAD0"><th style="width:28%">Old habit in your files</th><th style="width:44%">What to do now</th><th style="width:28%">Where it lives</th></tr>
+<tr><td>Hard rules (“comments: one line max”)</td><td>Delete them. The model applies judgment by default.</td><td style="color:#15803D">Built in</td></tr>
+<tr><td>Pages of worked examples</td><td>Describe the interface or expected output precisely</td><td>Tool descriptions, skills</td></tr>
+<tr><td>Load everything up front</td><td>Move detail out of always-loaded files</td><td>.claude/skills, .claude/rules</td></tr>
+<tr><td>Repeat key instructions</td><td>Say it once, where it applies</td><td>CLAUDE.md or the skill</td></tr>
+<tr><td>Session diary notes in CLAUDE.md</td><td>Delete them. Auto-memory keeps them. Module design docs stay: see “Additional thoughts” at the end.</td><td style="color:#15803D">Built in (auto-memory)</td></tr>
+<tr><td>Short text specs</td><td>Point at real code, headers and tests</td><td>@src/rt/ring.h, tests/rt</td></tr>
+</table>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Thariq Shihipar, “The new rules of context engineering” (Jul 2026); Claude Code docs, “How Claude remembers your project”.</p>
+
+</section>
+</div><div class="slide" data-title="CLAUDE.md: spend it on gotchas" data-note="The test is simple: for each line, could Claude find this by reading the code, and would it actually go and look? If both answers are yes, the line is wasted context. “Write clean modern C++” is obvious; “this project uses CMake” is visible from CMakeLists.txt; the shouting adds nothing. What stays is what Claude can’t safely infer: the exact build preset, the fast test label, that generated/ is produced by a script and must not be edited, and that the wire format is big-endian. This test is a judgement call, not a tool. If you’re unsure about a line, delete it, start a fresh session and run a typical task. If Claude still gets it right, the line can go."><section id="claudemd" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#6D28D9;font-weight:600">Rule 2 · Context</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">CLAUDE.md: spend it on gotchas</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="width:700px;display:flex;flex-direction:column;gap:18px;background:#0F1115;padding:40px;border-radius:16px">
+<h3 style="font-size:28px;font-weight:600;color:#A78BFA">The two-question test, per line</h3>
+<p style="font-size:26px;line-height:1.4;color:#E9E6DE">1. Could Claude find this by reading the code?<br>2. Would it actually go and look?<br><b>Both yes → cut the line.</b></p>
+<hr style="border-top:1px solid #3A404B">
+<p style="font-size:24px;line-height:1.45;color:#B8BCC8">It’s a review you do, not a tool. To test a doubtful line: delete it, start a fresh session, give a typical task, and see if Claude still gets it right. /doctor also flags lines Claude could derive from the code (next slide).</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:28px 36px;border:2px solid #BE123C;border-radius:16px">
+<h3 style="font-size:26px;font-weight:600;color:#BE123C">Cut</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#50555F">Write clean, modern C++.<br>This project uses CMake.<br>IMPORTANT!!! ALWAYS RUN THE TESTS</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:28px 36px;border:2px solid #15803D;border-radius:16px">
+<h3 style="font-size:26px;font-weight:600;color:#15803D">Keep</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#0F1115">Build: cmake --preset rt-debug<br>Tests: ctest --preset unit -L fast<br>generated/ comes from tools/gen.sh: never edit<br>Wire format is big-endian: use net/endian.h</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Aim for under 200 lines. A rule that must always hold belongs in a hook or a test, not in louder wording.</p>
+
+</section>
+</div><div class="slide" data-title="Three commands to audit your context" data-note="Three commands, each with a clear job. Slash context all shows what’s actually in the context window, including which CLAUDE.md, rules and memory files were loaded; it doesn’t change anything. Slash doctor is a setup checkup: installation, settings, extensions such as skills and MCP servers weighed against their context cost, and CLAUDE.md content that Claude could derive from the code. It reports first and only changes files after you confirm. Slash doctor prompt-audit is the one for this rule: it looks for instructions written for older models, references to files or commands that no longer exist, and files that contradict each other, and proposes the edits as a diff. Nothing changes until you ask. A good habit: run this routine every time you move to a new model."><section id="doctor" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#6D28D9;font-weight:600">Rule 2 · Commands explained</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">Three commands to audit your context</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#A78BFA">/context all</p>
+<p style="font-size:24px;line-height:1.45;color:#E9E6DE">Shows what’s in the context window by category, including which CLAUDE.md, rules and memory files loaded.</p>
+<p style="font-size:24px;line-height:1.45;color:#B8BCC8">Output: a coloured grid plus suggestions.<br>Edits files: no.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#A78BFA">/doctor</p>
+<p style="font-size:24px;line-height:1.45;color:#E9E6DE">Setup checkup: install and settings, unused skills and MCP servers against their context cost, CLAUDE.md lines Claude could derive from the code.</p>
+<p style="font-size:24px;line-height:1.45;color:#B8BCC8">Output: findings and proposed fixes.<br>Edits files: only after you confirm.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:28px;font-weight:600;color:#A78BFA">/doctor prompt-audit</p>
+<p style="font-size:24px;line-height:1.45;color:#E9E6DE">Audits CLAUDE.md, rules, skills and agents for instructions written for older models, references to missing files or commands, and contradictions.</p>
+<p style="font-size:24px;line-height:1.45;color:#B8BCC8">Output: findings and proposed edits as a diff.<br>Edits files: only when you ask.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:10px;background:#DEDAD0;padding:24px 36px;border-radius:16px">
+<p style="font-size:24px;font-weight:600;color:#50555F">A ten-minute routine, once per model upgrade</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#0F1115">/context all  →  /doctor prompt-audit  →  review the diff  →  apply  →  rerun one typical task</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Claude Code docs, “Commands”, “Skills” and “How Claude remembers your project”. prompt-audit needs Claude Code v2.1.283 or later; it can take a path, e.g. /doctor prompt-audit .claude/skills.</p>
+
+</section>
+</div><div class="slide" data-title="Layer instructions by where they apply" data-note="Three layers, each loading only where it applies. The root CLAUDE.md is loaded at launch, so it holds only repo-wide facts: the build preset and the rule about generated code. drivers/CLAUDE.md loads the first time Claude reads or edits a file under drivers/, so register-access and ISR rules cost nothing while Claude works on the audio path. The real-time rule lives in .claude/rules/rt.md with a paths glob. To answer the obvious question: yes, every markdown file under .claude/rules is discovered, including subfolders. A rule without a paths field loads at launch, just like CLAUDE.md. A rule with paths only loads when Claude reads, writes or edits a matching file, here any C or C++ file under src/rt."><section id="ex-context" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#6D28D9;font-weight:600">Rule 2 · Example in a C/C++ repo</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">Layer instructions by where they apply</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:32px 36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#A78BFA">CLAUDE.md</p>
+<p style="font-size:24px;color:#B8BCC8">Repo root · loaded at launch</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E9E6DE">Build: cmake --preset rt-debug<br><br>Never edit generated/; run tools/gen.sh</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:32px 36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#A78BFA">drivers/CLAUDE.md</p>
+<p style="font-size:24px;color:#B8BCC8">Loads when Claude reads or edits a file in drivers/</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E9E6DE">Touch registers only via hal/regs.h macros, never raw volatile casts.<br><br>ISRs: set a flag, defer work.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:32px 36px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#A78BFA">.claude/rules/rt.md</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#B8BCC8">paths: src/rt/**/*.{c,cc,cpp,h}</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#E9E6DE">No heap, locks or blocking calls in code reachable from rt_callback().<br><br>Hand data off via spsc_ring&lt;T,N&gt; (src/rt/ring.h).</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px;background:#F5F3EE;padding:26px 36px;border:1px solid #CFCABE;border-radius:16px">
+<p style="flex:1;font-size:24px;line-height:1.45;color:#0F1115"><b>How .claude/rules/ loads:</b> every .md under it is discovered, subfolders included. A rule <b>without</b> paths: loads at launch, like CLAUDE.md.</p>
+<p style="flex:1;font-size:24px;line-height:1.45;color:#0F1115">A rule <b>with</b> paths: loads only when Claude reads, writes or edits a matching file. Globs take lists and braces, e.g. *.{c,h}.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Claude Code docs, “How Claude remembers your project” and “Large codebases”. File contents are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="What loads when: one request, step by step" data-note="Here is exactly what loads, and when, for one real request. The session starts at the repo root: only skill descriptions are in context. You ask for a soft-clip stage in mix_callback. When Claude opens src/rt/mixer.cpp, the rt-safety skill that lives in src/rt/.claude/skills becomes available, because nested skills load the first time Claude touches a file in their folder. Its description fits the task, so Claude invokes it, and only now does the SKILL.md body enter context. Step one says run the lint script: Claude executes it and sees one line of output, not the script’s code. The output reports an allocation in the real-time path, so step two applies and Claude reads the lock-free reference file. It fixes the code and re-runs the script: zero findings. The latency budget file and the benchmark script were never loaded, because no step needed them. The context bar on the right shows how little this costs."><section id="sheet-skills" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p style="position:absolute;left:128px;top:120px;width:1664px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#A3E635;font-weight:600">Rule 3 · Skills</p>
+<h2 style="position:absolute;left:128px;top:166px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">What loads when: one request, step by step</h2>
+<iframe style="position:absolute;left:128px;top:270px;width:1664px;height:580px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:transparent;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 1664 580&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,CY=&#x27;#22D3EE&#x27;,LI=&#x27;#A3E635&#x27;,VI=&#x27;#A78BFA&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p){var e=el(&#x27;text&#x27;,{x:x,y:y,style:st+&#x27;;white-space:pre&#x27;},p);e.textContent=s;return e}
+function cl(v){return Math.max(0,Math.min(1,v))}
+function once(D,draw){draw(1);var st=0,raf=0;function step(n){if(!st)st=n;var t=Math.min(1,(n-st)/D);draw(t);if(t&lt;1)raf=requestAnimationFrame(step)}if(!window.IntersectionObserver)return;new IntersectionObserver(function(e){if(e[0].isIntersecting){st=0;cancelAnimationFrame(raf);raf=requestAnimationFrame(step)}},{threshold:.5}).observe(document.body)}
+[[&#x27;STEP&#x27;,0],[&#x27;WHAT HAPPENS&#x27;,130],[&#x27;WHAT ENTERS CONTEXT&#x27;,1000],[&#x27;CONTEXT USED&#x27;,1450]].forEach(function(h){tx(h[1],22,h[0],M+&#x27;font-size:22px;letter-spacing:2px;fill:&#x27;+ST)});el(&#x27;line&#x27;,{x1:0,y1:40,x2:1664,y2:40,stroke:DM,&#x27;stroke-width&#x27;:1});
+var R=[[&#x27;START&#x27;,&#x27;Session starts at the repo root&#x27;,&#x27;skill descriptions only&#x27;,2,LI],[&#x27;YOU&#x27;,&#x27;“add a soft-clip stage to mix_callback()”&#x27;,&#x27;your message&#x27;,3,B],[&#x27;READ&#x27;,&#x27;Claude opens src/rt/mixer.cpp&#x27;,&#x27;rt-safety becomes available&#x27;,1,LI],[&#x27;MATCH&#x27;,&#x27;Description fits the task → Claude invokes rt-safety&#x27;,&#x27;the SKILL.md body&#x27;,10,LI],[&#x27;RUN&#x27;,&#x27;Step 1: scripts/rt_lint.sh → “mixer.cpp:142 new in RT path”&#x27;,&#x27;the script’s output, not its code&#x27;,2,CY],[&#x27;READ&#x27;,&#x27;Step 2, allocation found: reference/lockfree.md&#x27;,&#x27;that one reference file&#x27;,8,VI],[&#x27;FIX&#x27;,&#x27;Preallocate in init(), re-run rt_lint.sh → 0 findings&#x27;,&#x27;output only&#x27;,1,CY],[&#x27;NEVER&#x27;,&#x27;reference/latency-budget.md · scripts/bench.sh source&#x27;,&#x27;nothing: step 3 wasn’t needed&#x27;,0,DM]],tot=27,G=[],acc=0;
+R.forEach(function(r,i){var y=96+i*64,g=el(&#x27;g&#x27;,{}),c=r[4];el(&#x27;rect&#x27;,{x:0,y:y-30,width:104,height:40,rx:6,fill:&#x27;none&#x27;,stroke:c,&#x27;stroke-width&#x27;:1.5,&#x27;stroke-dasharray&#x27;:i===7?&#x27;5 4&#x27;:&#x27;none&#x27;},g);tx(52,y-3,r[0],M+&#x27;font-size:22px;font-weight:700;text-anchor:middle;fill:&#x27;+c,g);
+tx(130,y-2,r[1],(i===4||i===5||i===6||i===7?M+&#x27;font-size:24px;&#x27;:F+&#x27;font-size:26px;&#x27;)+&#x27;fill:&#x27;+(i===7?ST:B),g);tx(1000,y-2,r[2],F+&#x27;font-size:24px;fill:&#x27;+(i===7?ST:c),g);
+el(&#x27;rect&#x27;,{x:1450,y:y-20,width:214,height:16,fill:&#x27;#1A1E25&#x27;},g);if(r[3]&gt;0)el(&#x27;rect&#x27;,{x:1450+214*acc/tot,y:y-20,width:Math.max(3,214*r[3]/tot),height:16,fill:c},g);if(acc&gt;0)el(&#x27;rect&#x27;,{x:1450,y:y-20,width:214*acc/tot,height:16,fill:ST,&#x27;fill-opacity&#x27;:.45},g);acc+=r[3];
+el(&#x27;line&#x27;,{x1:0,y1:y+22,x2:1664,y2:y+22,stroke:&#x27;#1A1E25&#x27;,&#x27;stroke-width&#x27;:1},g);G.push(g)});
+once(8000,function(t){G.forEach(function(g,i){var k=cl((t-.04-i*.11)/.07);g.setAttribute(&#x27;opacity&#x27;,k);g.setAttribute(&#x27;transform&#x27;,&#x27;translate(&#x27;+(16*(1-k)).toFixed(1)+&#x27; 0)&#x27;)})});
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+<p style="position:absolute;left:128px;top:870px;width:1664px;font-size:26px;line-height:1.45;color:#B8BCC8"><span style="color:#A3E635">Descriptions</span> are always loaded. <span style="color:#A3E635">SKILL.md</span> loads when the description fits the task, or when you type /rt-safety. <span style="color:#A78BFA">References</span> load only when a step needs them. <span style="color:#22D3EE">Scripts</span> are executed; their code never enters context.</p>
+
+</section>
+</div><div class="slide" data-title="A skill is a table of contents, not an encyclopedia" data-note="Skills load in three layers. Only the name and description are always in context, and Claude uses the description to choose among possibly a hundred skills, so it must say what the skill does and when to use it. SKILL.md loads when the description fits the task, and should stay under five hundred lines, acting as a table of contents. Reference files load only when a step needs them; scripts are executed and only their output enters context. On evals first, the question I get: yes, it means try the task without the skill first. Run three typical tasks, write down where Claude actually goes wrong, write the minimum that fixes those gaps, and rerun the same tasks with the skill to confirm it helps. If Claude already gets them right, you don’t need the skill."><section id="skills" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#4D7C0F;font-weight:600">Rule 3 · Skills</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">A skill is a table of contents,<br>not an encyclopedia</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<div style="width:760px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:column;gap:6px;background:#4D7C0F;padding:28px 36px;border-radius:16px">
+<p style="font-size:24px;color:#ECFCCB">1 · Always loaded</p>
+<p style="font-size:32px;font-weight:600;color:#F5F3EE">Name + description</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#DCD7CB;padding:28px 36px;border-radius:16px">
+<p style="font-size:24px;color:#50555F">2 · When the description fits the task</p>
+<p style="font-size:32px;font-weight:600;color:#0F1115">SKILL.md, under 500 lines</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#F5F3EE;padding:28px 36px;border:1px dashed #7D838E;border-radius:16px">
+<p style="font-size:24px;color:#50555F">3 · Only when a step needs it</p>
+<p style="font-size:32px;font-weight:600;color:#0F1115">Reference files · scripts (run, not read)</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:26px">
+<p style="font-size:28px;line-height:1.35;color:#0F1115"><b>Description</b> = what it does + when to use it. Not “Helps with code.”</p>
+<p style="font-size:28px;line-height:1.35;color:#0F1115"><b>One level deep:</b> link every file straight from SKILL.md.</p>
+<p style="font-size:28px;line-height:1.35;color:#0F1115"><b>Evals first:</b> run 3 typical tasks <i>without</i> the skill and note where Claude goes wrong. Write only what fixes that, then rerun the same tasks with the skill.</p>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="A skill that lives next to the code it serves" data-note="To answer the question directly: yes, any directory can have its own .claude/skills folder. A skill in src/rt/.claude/skills is picked up the first time Claude reads or edits a file under src/rt, or right away if you start Claude in that directory. Inside the skill, SKILL.md is the short map: a description that says what it checks and when, and numbered steps. The reference folder holds documents for specific steps; Claude reads lockfree.md only when step two applies. The scripts folder holds tools that SKILL.md tells Claude to run, like the real-time lint script; Claude executes them, and only their output enters context. That’s exactly the walkthrough from the sheet two slides back."><section id="ex-skills" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:20px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#4D7C0F;font-weight:600">Rule 3 · Example in a C/C++ repo</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">A skill that lives next to the code it serves</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="width:560px;display:flex;flex-direction:column;gap:16px;background:#0F1115;padding:32px 36px;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#A3E635">Layout</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.55;color:#E9E6DE">src/rt/<br>├─ mixer.cpp  ring.h  …<br>└─ .claude/skills/rt-safety/<br>&#160;&#160;&#160;├─ SKILL.md<br>&#160;&#160;&#160;├─ reference/lockfree.md<br>&#160;&#160;&#160;├─ reference/latency-budget.md<br>&#160;&#160;&#160;└─ scripts/rt_lint.sh</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:32px 36px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#50555F">SKILL.md</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#0F1115">name: rt-safety<br><span style="color:#4D7C0F">description: Checks real-time safety of C/C++ changes in src/rt/. Use when editing audio callbacks or code they call.</span><br>1. Run scripts/rt_lint.sh on changed files.<br>2. Allocation or lock found? Read reference/lockfree.md.<br>3. Timing-sensitive? Read reference/latency-budget.md.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<p style="flex:1;font-size:24px;line-height:1.45;color:#0F1115"><b>Can any source folder have its own .claude/skills/?</b> Yes. This one is picked up the first time Claude reads or edits a file in src/rt/, or when you start Claude there.</p>
+<p style="flex:1;font-size:24px;line-height:1.45;color:#0F1115"><b>reference/</b> = docs for one step, read only when that step applies. <b>scripts/</b> = tools SKILL.md tells Claude to run; executed, never loaded.</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Claude Code docs, “Skills” and “Large codebases”. Skill contents are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="Group skills by workflow. A group loads only when it’s used." data-note="A question that came up: can we tell Claude to load a set of skills only for building and testing, and another set only for coding? You don’t need an index file for that, because skills already load on demand. The pattern is one skill per workflow group. The build-test folder has a short SKILL.md that acts as the group’s entry point, and the details live in files beside it: build, unit tests, hardware tests, flaky tests. When someone says the latency test fails on the bench rig, the description matches, SKILL.md loads, and it sends Claude to hw-tests.md and nothing else. Nothing in the coding group loads at all. A side benefit: at startup Claude sees two descriptions instead of twenty. One rule on naming: only a file called SKILL.md inside its own folder under .claude/skills is a skill. Other files in that folder can have any name; they are read when SKILL.md sends Claude there."><section id="skills-groups" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 130px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#A3E635;font-weight:600">Rule 3 · Structuring many skills</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">Group skills by workflow. A group loads only when it’s used.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="width:560px;display:flex;flex-direction:column;gap:12px;background:#14171C;padding:24px 30px;border:1px solid #3A404B;border-radius:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;letter-spacing:2px;text-transform:uppercase;color:#7D838E">One folder per group</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;line-height:1.5;color:#E9E6DE">.claude/skills/<br>├─ build-test/<br>│&nbsp;&nbsp;├─ <span style="color:#A3E635">SKILL.md</span>&nbsp;&nbsp;<span style="color:#7D838E">the entry point</span><br>│&nbsp;&nbsp;├─ build.md<br>│&nbsp;&nbsp;├─ unit-tests.md<br>│&nbsp;&nbsp;├─ <span style="color:#A78BFA">hw-tests.md</span><br>│&nbsp;&nbsp;└─ flaky.md<br>└─ coding/<br>&nbsp;&nbsp;&nbsp;├─ <span style="color:#A3E635">SKILL.md</span><br>&nbsp;&nbsp;&nbsp;├─ style.md<br>&nbsp;&nbsp;&nbsp;├─ rt-patterns.md<br>&nbsp;&nbsp;&nbsp;└─ review.md</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:10px;background:#14171C;padding:24px 30px;border:1px solid #3A404B;border-radius:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;color:#A3E635">build-test/SKILL.md</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;line-height:1.5;color:#E9E6DE"><span style="color:#7D838E">---</span><br>name: build-test<br><span style="color:#A3E635">description: Build, run or debug tests. Use for any<br>cmake, ctest, CI or test-failure task.</span><br><span style="color:#7D838E">---</span><br>Build: read build.md<br>Unit tests: read unit-tests.md<br>Tests under tests/rt: read hw-tests.md (USB loopback)<br>Passes locally, fails in CI: read flaky.md</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#1A2410;padding:18px 26px;border-left:4px solid #A3E635;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#E9E6DE">&gt; tests/rt/latency fails on the bench rig</p>
+<p style="font-size:22px;line-height:1.4;color:#B8BCC8">Loads: <span style="color:#A3E635">build-test/SKILL.md</span> → <span style="color:#A78BFA">hw-tests.md</span>. Not loaded: build.md, flaky.md, or anything in coding/.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:52px;width:1664px;font-size:22px;line-height:1.4;color:#7D838E">At startup Claude sees 2 descriptions instead of 20. Only <span style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#B8BCC8">.claude/skills/&lt;name&gt;/SKILL.md</span> is a skill: a file called skill_a.md anywhere else is never discovered. Contents are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="Choose by what should trigger the loading." data-note="There are four ways to load guidance only when it’s needed, and the choice depends on what should trigger it. A group skill loads when the task matches its description, or when you type its name; use it for workflows. A path rule loads when Claude reads or edits matching files; use it for conventions tied to code, like our real-time rules. A plain pointer line in CLAUDE.md also works: Claude follows it and reads the file when needed, but it isn’t a command and can’t be shared as a plugin, so keep it for documents that aren’t workflows. A plugin packages skill groups so several repos can share them. Two notes. Don’t write a router skill that says “real-time skills are over there”: the descriptions already do that routing. And skills can hand off to each other: one skill can name the next step, for example run rt-review after a fix."><section id="skills-options" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 140px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#4D7C0F;font-weight:600">Rule 3 · Four ways to load guidance on demand</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#0F1115">Choose by what should trigger the loading.</h2>
+</div>
+<table style="font-size:25px;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif">
+<tr style="background:#DEDAD0"><th style="width:20%">Mechanism</th><th style="width:27%">Loads when</th><th style="width:25%">Best for</th><th style="width:28%">Example</th></tr>
+<tr><td><b>Group skill</b> <span style="font-size:18px;color:#15803D;font-weight:600">recommended</span></td><td>The task matches its description, or you type /build-test</td><td>Workflows: build, test, review, release</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px">.claude/skills/build-test/</td></tr>
+<tr><td><b>Path rule</b></td><td>Claude reads or edits a matching file</td><td>Conventions tied to code: RT-1..RT-5</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px">.claude/rules/rt.md + paths:</td></tr>
+<tr><td><b>Pointer in CLAUDE.md</b></td><td>Claude follows a line you wrote</td><td>A plain document that isn’t a workflow</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px">Before changing the ABI, read docs/abi.md</td></tr>
+<tr><td><b>Plugin</b></td><td>It’s enabled for the project</td><td>The same skill groups across many repos</td><td style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px">an rt-build-tools plugin</td></tr>
+</table>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#F5F3EE;padding:22px 28px;border:1px solid #CFCABE;border-left:5px solid #BE123C;border-radius:10px">
+<p style="font-size:26px;font-weight:600;color:#0F1115">Skip the “router” skill</p>
+<p style="font-size:24px;line-height:1.4;color:#50555F">Every description is already in context, and Claude routes by it. A router adds a step and a second place to keep up to date.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:6px;background:#F5F3EE;padding:22px 28px;border:1px solid #CFCABE;border-left:5px solid #4D7C0F;border-radius:10px">
+<p style="font-size:26px;font-weight:600;color:#0F1115">Skills can hand off</p>
+<p style="font-size:24px;line-height:1.4;color:#50555F">One skill can name the next: <span style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#0F1115">After the fix, run rt-review on the changed files.</span></p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:22px;color:#50555F">Source: Claude Code docs, “Skills”, “How Claude remembers your project” and “Plugins”. Examples are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="sheet-effort" data-note="Sheet four is a test rig. On the left, the effort gauge. On the right, the specimen: a real task from Thariq’s Terminal-Bench analysis, fixing a storage-engine crash without breaking compaction. On low, the inspection pass covers a sliver of the code and finds nothing; it passed zero of five tries in about a minute each. Then the needle moves to xhigh. The scan covers everything and catches three edge cases: it reproduced the crash first, tested against a reference that never compacts, and checked its tests fail on half-finished fixes. Four of five, about eleven minutes per try. The fourth mark stays grey on purpose: a wrong approach is not an effort problem."><section id="sheet-effort" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:0px">
+<iframe style="position:absolute;left:0px;top:0px;width:1920px;height:1080px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:#0F1115;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 800 450&quot; preserveAspectRatio=&quot;xMidYMid meet&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),C=&#x27;#0F1115&#x27;,B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,GR=&#x27;#171A20&#x27;,A=&#x27;#22D3EE&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p,an,tr){var o={x:x,y:y,&#x27;text-anchor&#x27;:an||&#x27;start&#x27;,style:st};if(tr)o.transform=tr;var e=el(&#x27;text&#x27;,o,p);e.textContent=s;return e}
+var sd=3;function R(){sd=sd*16807%2147483647;return(sd-1)/2147483646}
+function ln(x1,y1,x2,y2,c,w,d,p){var o={x1:x1,y1:y1,x2:x2,y2:y2,stroke:c,&#x27;stroke-width&#x27;:w||.8};if(d)o[&#x27;stroke-dasharray&#x27;]=d;return el(&#x27;line&#x27;,o,p)}
+function chrome(eb,h,dwg,sh,notes){el(&#x27;rect&#x27;,{width:800,height:450,fill:C});var g=el(&#x27;g&#x27;,{});for(var x=20;x&lt;800;x+=20)ln(x,8,x,442,GR,.5,0,g);for(var y=20;y&lt;450;y+=20)ln(8,y,792,y,GR,.5,0,g);for(var i=0;i&lt;600;i++)el(&#x27;circle&#x27;,{cx:R()*800,cy:R()*450,r:.3+R()*.5,fill:B,&#x27;fill-opacity&#x27;:.02+R()*.04},g);el(&#x27;rect&#x27;,{x:8,y:8,width:784,height:434,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.9});el(&#x27;rect&#x27;,{x:22,y:22,width:756,height:406,fill:&#x27;none&#x27;,stroke:DM,&#x27;stroke-width&#x27;:.6});for(var z=0;z&lt;6;z++){var zx=8+(z+.5)*784/6;tx(zx,19,&#x27;&#x27;+(z+1),M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);tx(zx,439,&#x27;&#x27;+(z+1),M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);if(z){ln(8+z*784/6,8,8+z*784/6,22,ST,.6);ln(8+z*784/6,428,8+z*784/6,442,ST,.6)}}&#x27;ABCD&#x27;.split(&#x27;&#x27;).forEach(function(L,k){var zy=8+(k+.5)*434/4;tx(15,zy+4,L,M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);tx(785,zy+4,L,M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;)});
+if(eb){tx(38,48,eb,M+&#x27;font-size:11px;letter-spacing:1.4px;fill:&#x27;+A);tx(38,70,h,F+&#x27;font-weight:700;font-size:18px;fill:&#x27;+B)}
+var t=el(&#x27;g&#x27;,{});el(&#x27;rect&#x27;,{x:536,y:382,width:238,height:40,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.8},t);ln(536,402,774,402,DM,.6,0,t);ln(678,382,678,422,DM,.6,0,t);tx(542,396,&#x27;DWG &#x27;+dwg,M+&#x27;font-size:11px;fill:&#x27;+B,t);tx(684,396,&#x27;SHEET &#x27;+sh,M+&#x27;font-size:11px;fill:&#x27;+B,t);tx(542,416,&#x27;SCALE 1:1&#x27;,M+&#x27;font-size:11px;fill:&#x27;+ST,t);tx(684,416,&#x27;REV 5.5&#x27;,M+&#x27;font-size:11px;fill:&#x27;+ST,t);
+if(notes){tx(38,378,&#x27;NOTES&#x27;,M+&#x27;font-size:10px;letter-spacing:1.4px;fill:&#x27;+ST);notes.forEach(function(s,k){tx(38,392+k*13,s,M+&#x27;font-size:10.5px;fill:&#x27;+ST)})}}
+function E(t){t=Math.max(0,Math.min(1,t));return t&lt;.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+chrome(&#x27;SHEET 4/5 — EFFORT · TEST RIG&#x27;,&#x27;More effort buys more checks, so more edge cases get caught.&#x27;,&#x27;claude-5/effort&#x27;,&#x27;4/5&#x27;,[&#x27;1. DEFAULT MEDIUM ON OPUS 5.5. SAVE XHIGH/MAX FOR MEASURED GAINS.&#x27;,&#x27;2. DRAFT ON LOW, VERIFY ON HIGH.&#x27;,&#x27;3. EFFORT FINDS EDGE CASES. IT DOES NOT FIX A WRONG APPROACH.&#x27;]);
+var cx=190,cy=226,r=96;function pt(a,rr){var q=a*Math.PI/180;return[cx+rr*Math.cos(q),cy-rr*Math.sin(q)]}
+function arc(a0,a1,rr){var p0=pt(a0,rr),p1=pt(a1,rr);return&#x27;M&#x27;+p0[0].toFixed(1)+&#x27; &#x27;+p0[1].toFixed(1)+&#x27; A&#x27;+rr+&#x27; &#x27;+rr+&#x27; 0 &#x27;+((a0-a1)&gt;180?1:0)+&#x27; 1 &#x27;+p1[0].toFixed(1)+&#x27; &#x27;+p1[1].toFixed(1)}
+el(&#x27;path&#x27;,{d:arc(210,-30,r+8),fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.6});el(&#x27;path&#x27;,{d:arc(210,-30,r),fill:&#x27;none&#x27;,stroke:B,&#x27;stroke-width&#x27;:.9});
+var zones=[&#x27;LOW&#x27;,&#x27;MED&#x27;,&#x27;HIGH&#x27;,&#x27;XHIGH&#x27;,&#x27;MAX&#x27;],band=[];zones.forEach(function(z,i){band.push(el(&#x27;path&#x27;,{d:arc(210-48*i-1,210-48*(i+1)+1,r-14),fill:&#x27;none&#x27;,stroke:DM,&#x27;stroke-width&#x27;:7}));var m=pt(186-48*i,r+20);tx(m[0],m[1]+4,z,M+&#x27;font-size:10px;letter-spacing:1px;fill:&#x27;+ST,0,&#x27;middle&#x27;)});
+for(var a=210;a&gt;=-30;a-=4){var k=210-a,len=k%48===0?14:(k%12===0?8:4),p1=pt(a,r),p2=pt(a,r-len);ln(p1[0],p1[1],p2[0],p2[1],B,k%48===0?1.1:.6)}
+tx(cx,cy+46,&#x27;EFFORT&#x27;,M+&#x27;font-size:10px;letter-spacing:2px;fill:&#x27;+ST,0,&#x27;middle&#x27;);
+var nd=el(&#x27;g&#x27;,{});var nl=el(&#x27;line&#x27;,{stroke:A,&#x27;stroke-width&#x27;:2.2,&#x27;stroke-linecap&#x27;:&#x27;round&#x27;},nd),nt=el(&#x27;line&#x27;,{stroke:B,&#x27;stroke-width&#x27;:4,&#x27;stroke-linecap&#x27;:&#x27;round&#x27;},nd);el(&#x27;circle&#x27;,{cx:cx,cy:cy,r:8,fill:C,stroke:B,&#x27;stroke-width&#x27;:1});el(&#x27;circle&#x27;,{cx:cx,cy:cy,r:2.8,fill:A});
+el(&#x27;rect&#x27;,{x:118,y:294,width:144,height:56,fill:&#x27;#14171C&#x27;,stroke:B,&#x27;stroke-width&#x27;:.8});var ro=[tx(126,311,&#x27;&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+B),tx(126,326,&#x27;&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+B),tx(126,341,&#x27;&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+A)];
+el(&#x27;rect&#x27;,{x:336,y:98,width:280,height:214,fill:&#x27;#0A0C0F&#x27;,opacity:.6});el(&#x27;rect&#x27;,{x:330,y:92,width:280,height:214,fill:&#x27;#14171C&#x27;,stroke:B,&#x27;stroke-width&#x27;:.9});
+tx(340,108,&#x27;SPECIMEN · storage-engine crash fix&#x27;,M+&#x27;font-size:10.5px;font-weight:700;fill:&#x27;+B);tx(340,121,&#x27;mvcc-lsm-compaction · Opus 5.5&#x27;,M+&#x27;font-size:10px;fill:&#x27;+ST);ln(330,128,610,128,DM,.6);
+for(var i=0;i&lt;16;i++){var y=140+i*10,ind=[0,1,1,2,2,1,2,3,3,2,1,1,2,2,1,0][i],w=50+R()*150;ln(338,y,348,y,DM,1.2);el(&#x27;rect&#x27;,{x:356+ind*12,y:y-2.5,width:Math.min(w,596-356-ind*12),height:5,fill:ST,&#x27;fill-opacity&#x27;:.45})}
+var dfs=[{x:404,y:172,id:&#x27;E1&#x27;},{x:520,y:212,id:&#x27;E2&#x27;},{x:452,y:252,id:&#x27;E3&#x27;},{x:566,y:282,id:&#x27;X&#x27;}];
+dfs.forEach(function(d){d.c=el(&#x27;polyline&#x27;,{points:[d.x-10,d.y-3,d.x-4,d.y+3,d.x,d.y-4,d.x+5,d.y+3,d.x+10,d.y-2].join(&#x27;,&#x27;),fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:1,&#x27;stroke-opacity&#x27;:.5});d.r=el(&#x27;circle&#x27;,{cx:d.x,cy:d.y,r:12,fill:&#x27;none&#x27;,stroke:A,&#x27;stroke-width&#x27;:1.1,opacity:0});d.l=tx(d.x+15,d.y-8,d.id,M+&#x27;font-size:10px;font-weight:700;fill:&#x27;+A,0);d.l.setAttribute(&#x27;opacity&#x27;,0)});
+var xg=el(&#x27;g&#x27;,{opacity:0});el(&#x27;circle&#x27;,{cx:566,cy:282,r:12,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:1,&#x27;stroke-dasharray&#x27;:&#x27;3 2&#x27;},xg);el(&#x27;rect&#x27;,{x:398,y:288,width:156,height:14,fill:&#x27;#14171C&#x27;},xg);tx(552,298,&#x27;approach: effort won’t fix&#x27;,M+&#x27;font-size:10px;fill:&#x27;+ST,xg,&#x27;end&#x27;);
+var scan=el(&#x27;g&#x27;,{opacity:0});var sl=el(&#x27;line&#x27;,{y1:130,y2:304,stroke:A,&#x27;stroke-width&#x27;:1.2},scan);var sb=el(&#x27;rect&#x27;,{y:130,height:174,width:14,fill:A,&#x27;fill-opacity&#x27;:.08},scan);
+tx(628,104,&#x27;INSPECTION LOG&#x27;,M+&#x27;font-size:10px;letter-spacing:1.4px;fill:&#x27;+ST);var lg=[&#x27;E1 repro first&#x27;,&#x27;E2 random vs ref&#x27;,&#x27;E3 half-fix fails&#x27;,&#x27;X  approach&#x27;],lb=lg.map(function(s,i){var y=124+i*18;return{b:el(&#x27;rect&#x27;,{x:628,y:y-9,width:10,height:10,fill:C,stroke:ST,&#x27;stroke-width&#x27;:.8}),t:tx(644,y,s,M+&#x27;font-size:10px;fill:&#x27;+ST)}});
+ln(628,206,774,206,DM,.6);[[&#x27;LEVEL&#x27;,628],[&#x27;TIME&#x27;,684],[&#x27;PASS&#x27;,738]].forEach(function(h){tx(h[1],222,h[0],M+&#x27;font-size:10px;letter-spacing:1px;fill:&#x27;+ST)});
+var tr1=[tx(628,240,&#x27;low&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+B),tx(684,240,&#x27;1 min&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+B),tx(738,240,&#x27;0/5&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+B)],tr2=[tx(628,258,&#x27;xhigh&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+ST),tx(684,258,&#x27;11 min&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+ST),tx(738,258,&#x27;4/5&#x27;,M+&#x27;font-size:10.5px;fill:&#x27;+ST)];
+tx(628,280,&#x27;T-Bench 3.0, 5 tries&#x27;,M+&#x27;font-size:10px;fill:&#x27;+DM);
+var T=12000,t0=performance.now();
+function frame(now){var t=(now-t0)%T/T,hi=E((t-.34)/.14);if(t&gt;.9)hi=E(1-(t-.9)/.08);var ang=186-144*hi;var p=pt(ang,r-18),q=pt(ang+180,16);nl.setAttribute(&#x27;x1&#x27;,cx);nl.setAttribute(&#x27;y1&#x27;,cy);nl.setAttribute(&#x27;x2&#x27;,p[0].toFixed(1));nl.setAttribute(&#x27;y2&#x27;,p[1].toFixed(1));nt.setAttribute(&#x27;x1&#x27;,cx);nt.setAttribute(&#x27;y1&#x27;,cy);nt.setAttribute(&#x27;x2&#x27;,q[0].toFixed(1));nt.setAttribute(&#x27;y2&#x27;,q[1].toFixed(1));
+var zi=hi&gt;.5?3:0;band.forEach(function(b,i){b.setAttribute(&#x27;stroke&#x27;,i===zi?A:DM)});
+var H=hi&gt;.5;ro[0].textContent=&#x27;LEVEL  &#x27;+(H?&#x27;xhigh&#x27;:&#x27;low&#x27;);ro[1].textContent=&#x27;TIME   &#x27;+(H?&#x27;~11 min/try&#x27;:&#x27;~1 min/try&#x27;);ro[2].textContent=&#x27;PASS   &#x27;+(H?&#x27;4/5&#x27;:&#x27;0/5&#x27;);
+var s=-1;if(t&gt;.08&amp;&amp;t&lt;.2)s=.25*E((t-.08)/.12);else if(t&gt;.52&amp;&amp;t&lt;.78)s=E((t-.52)/.26);if(s&gt;=0){scan.setAttribute(&#x27;opacity&#x27;,1);var x=330+280*s;sl.setAttribute(&#x27;x1&#x27;,x);sl.setAttribute(&#x27;x2&#x27;,x);sb.setAttribute(&#x27;x&#x27;,x-14)}else scan.setAttribute(&#x27;opacity&#x27;,0);
+var sx=t&gt;.52&amp;&amp;t&lt;.9?(s&gt;=0?330+280*s:610):0;
+dfs.forEach(function(d,i){var f=i&lt;3&amp;&amp;sx&gt;d.x;d.r.setAttribute(&#x27;opacity&#x27;,f?1:0);d.l.setAttribute(&#x27;opacity&#x27;,f?1:0);d.c.setAttribute(&#x27;stroke&#x27;,f?A:ST);d.c.setAttribute(&#x27;stroke-opacity&#x27;,f?1:.5);var L=lb[i];if(i&lt;3){L.b.setAttribute(&#x27;fill&#x27;,f?A:C);L.b.setAttribute(&#x27;stroke&#x27;,f?A:ST);L.t.style.fill=f?B:ST}});
+xg.setAttribute(&#x27;opacity&#x27;,t&gt;.78&amp;&amp;t&lt;.9?1:0);tr1.forEach(function(e){e.style.fill=H?ST:B});tr2.forEach(function(e,i){e.style.fill=H?(i===2?A:B):ST});requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+
+</section>
+</div><div class="slide" data-title="Effort buys thoroughness, not intelligence" data-note="Lydia Hallie from the Claude Code team puts it simply: the model sets how capable Claude is, effort sets how thorough it is. Effort controls how many files it reads, how much it checks, and how far it goes before checking in. Thariq’s tests show the cost: the same vague prompt took a minute and a half on low and 67 minutes on max. They also show where it pays: on a data-analysis task, low passed zero of five, high passed four of five, because it tried two methods and caught the mismatch."><section id="effort" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:64px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 4 · Effort</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Effort buys thoroughness, not intelligence</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1;color:#0E7490;white-space:nowrap">1.5 → 67</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">minutes, low vs max</h3>
+<p style="font-size:24px;line-height:1.45;color:#50555F">Same vague prompt: “build a fitness tracker app.” Low gave a log and a graph; max gave a much richer app.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1;color:#0E7490;white-space:nowrap">0/5 → 4/5</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">passes, low vs high</h3>
+<p style="font-size:24px;line-height:1.45;color:#50555F">A data-analysis task. On high, Claude tried two methods, saw they disagreed and worked out why.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1;color:#0E7490;white-space:nowrap">Medium</p>
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">is the new default</h3>
+<p style="font-size:24px;line-height:1.45;color:#50555F">Opus 5.5 at medium matches or beats Opus 5 at high. Save xhigh and max for measured gains.</p>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="Where higher effort pays off" data-note="This chart is from Thariq’s deep dive into Terminal-Bench 3.0. Higher effort helps most where there are lots of hidden edge cases: hardware went from 34 to 75 percent, security from 64 to 87. Rulebook-style operations work barely moves. The lesson for us: put effort on the steps where mistakes hide, like checking numbers or security-sensitive code, not on formatting an email. Note this is Fable 5.1 data from Anthropic’s own runs."><section id="effortchart" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 4 · Effort</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Where higher effort pays off</h2>
+</div>
+<p style="font-size:24px;color:#50555F">Pass rate by task area · light dot = low effort, dark dot = high effort · gain in percentage points</p>
+<div data-build-in="left 1 auto" style="position:absolute;left:128px;top:360px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Hardware</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:374px;top:27px;width:451px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:362px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:811px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:284px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">34%</p>
+<p style="position:absolute;left:849px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">75%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+41 pts</p>
+</div>
+<div data-build-in="left 2 auto" style="position:absolute;left:128px;top:428px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Security</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:704px;top:27px;width:253px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:692px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:943px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:614px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">64%</p>
+<p style="position:absolute;left:981px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">87%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+23 pts</p>
+</div>
+<div data-build-in="left 3 auto" style="position:absolute;left:128px;top:496px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Science</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:451px;top:27px;width:220px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:439px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:657px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:361px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">41%</p>
+<p style="position:absolute;left:695px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">61%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+20 pts</p>
+</div>
+<div data-build-in="left 4 auto" style="position:absolute;left:128px;top:564px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">ML</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:594px;top:27px;width:209px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:582px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:789px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:504px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">54%</p>
+<p style="position:absolute;left:827px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">73%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+19 pts</p>
+</div>
+<div data-build-in="left 5 auto" style="position:absolute;left:128px;top:632px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Software</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:473px;top:27px;width:143px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:461px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:602px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:383px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">43%</p>
+<p style="position:absolute;left:640px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">56%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+13 pts</p>
+</div>
+<div data-build-in="left 6 auto" style="position:absolute;left:128px;top:700px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Media</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:198px;top:27px;width:132px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:186px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:316px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:108px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">18%</p>
+<p style="position:absolute;left:354px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">30%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+12 pts</p>
+</div>
+<div data-build-in="left 7 auto" style="position:absolute;left:128px;top:768px;width:1588px;display:flex;flex-direction:row;align-items:center;gap:24px">
+<p style="width:240px;font-size:28px;color:#0F1115">Operations</p>
+<div style="position:relative;width:1100px;height:60px;flex:none">
+<div style="position:absolute;left:132px;top:27px;width:110px;height:6px;background:#B5AFA2"></div>
+<div style="position:absolute;left:120px;top:18px;width:24px;height:24px;background:#B5AFA2;border-radius:50%"></div>
+<div style="position:absolute;left:228px;top:16px;width:28px;height:28px;background:#0E7490;border-radius:50%"></div>
+<p style="position:absolute;left:42px;top:13px;width:70px;font-size:24px;text-align:right;color:#50555F">12%</p>
+<p style="position:absolute;left:266px;top:13px;width:80px;font-size:24px;font-weight:600;color:#0F1115">22%</p>
+</div>
+<p style="width:200px;font-size:28px;font-weight:600;text-align:right;color:#0F1115">+10 pts</p>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Source: Thariq Shihipar, “Spending your effort” (Sep 2026). Terminal-Bench 3.0, Fable 5.1, 5 tries per task.</p>
+
+</section>
+</div><div class="slide" data-title="Match the level to the step" data-note="Here is a practical rule of thumb from Thariq’s post, and the loop he uses for feature work. Have Claude interview you about the spec, build on low effort so you get a fast first version, review and iterate on low, then switch to high effort to verify and test. In a report workflow that means: formatting and the email on low, the write-up on medium, and the number check on high, because that is where hidden edge cases live."><section id="effortlevels" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 4 · Effort</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Match the level to the step</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:48px">
+<table style="font-size:28px;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;width:1000px">
+<tr style="background:#DEDAD0"><th style="width:26%">Level</th><th style="width:74%">Use it for</th></tr>
+<tr><td>Low</td><td>Brainstorms, first drafts, formatting, small edits</td></tr>
+<tr><td>Medium</td><td>Most everyday work with a clear scope</td></tr>
+<tr><td>High</td><td>Checking numbers, bug fixes, anything with edge cases</td></tr>
+<tr><td>Max</td><td>Hard autonomous problems, e.g. a security review</td></tr>
+</table>
+<div style="flex:1;display:flex;flex-direction:column;gap:20px;background:#0F1115;padding:44px;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600;color:#22D3EE">A loop that works</h3>
+<ol style="font-size:28px;line-height:1.6;color:#ECE9E1">
+<li>Claude interviews you</li>
+<li>Build on low</li>
+<li>Review, iterate on low</li>
+<li>Verify and test on high</li>
+</ol>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="Same bug fix, two effort levels" data-note="This is a real task from Thariq’s Terminal-Bench analysis: fix a storage-engine crash from its crash report without breaking compaction. On low effort, Claude edited the code before even running the reproducer, and never checked that its new test would have caught the original bug. Zero out of five. On xhigh, it reproduced the crash first, wrote a randomized test against a reference implementation that never compacts, and checked that its tests fail on half-finished fixes. Four out of five. That is exactly the kind of hidden-edge-case work where effort pays. The bottom strip is the docs’ guidance for everyday work in your own repo."><section id="ex-effort" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 4 · Example: a storage-engine crash</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Same bug fix, two effort levels</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:44px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#50555F">Low effort · ~1 min per try</h3>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#50555F">0/5 passed</p>
+<ul style="font-size:24px;line-height:1.5;color:#0F1115">
+<li>Edited code before running the reproducer</li>
+<li>Didn’t check its test catches the bug</li>
+</ul>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#0F1115;padding:44px;border-radius:16px">
+<h3 style="font-size:24px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:#B8BCC8">xhigh effort · ~11 min per try</h3>
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#22D3EE">4/5 passed</p>
+<ul style="font-size:24px;line-height:1.5;color:#ECE9E1">
+<li>Reproduced the crash first</li>
+<li>Randomized test vs. a never-compacting reference</li>
+<li>Checked tests fail on half-finished fixes</li>
+</ul>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:12px;background:#DEDAD0;padding:28px 40px;border-radius:16px">
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center"><p style="width:300px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#0F1115">/effort low</p><p style="flex:1;font-size:26px;color:#0F1115">a rename across a few files, a first sketch</p></div>
+<div style="display:flex;flex-direction:row;gap:24px;align-items:center"><p style="width:300px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;font-weight:600;color:#0F1115">/effort high</p><p style="flex:1;font-size:26px;color:#0F1115">a flaky test, a bug in code you didn’t write, a schema change with many readers</p></div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Sources: Thariq Shihipar, “Spending your effort” (Terminal-Bench 3.0 task mvcc-lsm-compaction, Opus 5.5); Claude Code docs, “Best practices”.</p>
+
+</section>
+</div><div class="slide" data-title="Wrong result? Ask one question" data-note="Lydia Hallie’s diagnostic is the most useful single idea in the effort posts. When the output is wrong, check the context first. Then ask: did it not try hard enough, or did it not know enough? Skipping a file or not running tests means it didn’t try hard enough, so raise the effort. If it had everything, clearly tried and still got it wrong, it didn’t know enough, so move up to a bigger model."><section id="diagnose" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:48px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 4 · Effort</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Wrong result? Ask one question</h2>
+</div>
+<p style="font-size:32px;line-height:1.4;color:#50555F">First check the context: is the prompt clear, and does Claude have the right files and tools?</p>
+<div style="display:flex;flex-direction:row;gap:32px;flex:1">
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:44px;font-weight:600;color:#0F1115">Didn’t try hard enough?</h3>
+<p style="font-size:28px;line-height:1.45;color:#50555F">It skipped a file, didn’t run the tests, didn’t double-check.</p>
+<div style="flex:1"></div>
+<p style="font-size:32px;font-weight:600;color:#0E7490">→ Raise the effort</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:24px;background:#F5F3EE;padding:48px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:44px;font-weight:600;color:#0F1115">Didn’t know enough?</h3>
+<p style="font-size:28px;line-height:1.45;color:#50555F">It had everything it needed, clearly tried, and was still wrong.</p>
+<div style="flex:1"></div>
+<p style="font-size:32px;font-weight:600;color:#0E7490">→ Use a bigger model (Sonnet → Opus)</p>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="sheet-agents" data-note="Sheet five shows two pipelines carrying the same work item, the block with six details on top. Lane A is the org chart: data puller, analyst, writer, checker. Watch the details fall off at each handoff. By the end it has lost four of six, which is the lossy-summary problem the Applied AI post describes. Lane B is one agent with skills, tools and a single context window, plus a reviewer that checks the result without seeing how it was made. All six details arrive, verified. The table on the right sums it up, including the one hard number: one customer measured about two times faster runtime with a single loop."><section id="sheet-agents" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:0px">
+<iframe style="position:absolute;left:0px;top:0px;width:1920px;height:1080px" srcdoc="&lt;!doctype html&gt;&lt;html&gt;&lt;head&gt;&lt;style&gt;html,body{margin:0;height:100%;background:#0F1115;overflow:hidden}svg{display:block;width:100%;height:100%}&lt;/style&gt;&lt;/head&gt;&lt;body&gt;&lt;svg id=&quot;s&quot; viewBox=&quot;0 0 800 450&quot; preserveAspectRatio=&quot;xMidYMid meet&quot;&gt;&lt;/svg&gt;&lt;script&gt;
+var N=&#x27;http://www.w3.org/2000/svg&#x27;,S=document.getElementById(&#x27;s&#x27;),C=&#x27;#0F1115&#x27;,B=&#x27;#E9E6DE&#x27;,ST=&#x27;#7D838E&#x27;,DM=&#x27;#3A404B&#x27;,GR=&#x27;#171A20&#x27;,A=&#x27;#22D3EE&#x27;,M=&#x27;font-family:Consolas,Menlo,monospace;&#x27;,F=&#x27;font-family:Arial,Helvetica,sans-serif;&#x27;;
+function el(t,a,p){var e=document.createElementNS(N,t);for(var k in a)e.setAttribute(k,a[k]);(p||S).appendChild(e);return e}
+function tx(x,y,s,st,p,an,tr){var o={x:x,y:y,&#x27;text-anchor&#x27;:an||&#x27;start&#x27;,style:st};if(tr)o.transform=tr;var e=el(&#x27;text&#x27;,o,p);e.textContent=s;return e}
+var sd=3;function R(){sd=sd*16807%2147483647;return(sd-1)/2147483646}
+function ln(x1,y1,x2,y2,c,w,d,p){var o={x1:x1,y1:y1,x2:x2,y2:y2,stroke:c,&#x27;stroke-width&#x27;:w||.8};if(d)o[&#x27;stroke-dasharray&#x27;]=d;return el(&#x27;line&#x27;,o,p)}
+function chrome(eb,h,dwg,sh,notes){el(&#x27;rect&#x27;,{width:800,height:450,fill:C});var g=el(&#x27;g&#x27;,{});for(var x=20;x&lt;800;x+=20)ln(x,8,x,442,GR,.5,0,g);for(var y=20;y&lt;450;y+=20)ln(8,y,792,y,GR,.5,0,g);for(var i=0;i&lt;600;i++)el(&#x27;circle&#x27;,{cx:R()*800,cy:R()*450,r:.3+R()*.5,fill:B,&#x27;fill-opacity&#x27;:.02+R()*.04},g);el(&#x27;rect&#x27;,{x:8,y:8,width:784,height:434,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.9});el(&#x27;rect&#x27;,{x:22,y:22,width:756,height:406,fill:&#x27;none&#x27;,stroke:DM,&#x27;stroke-width&#x27;:.6});for(var z=0;z&lt;6;z++){var zx=8+(z+.5)*784/6;tx(zx,19,&#x27;&#x27;+(z+1),M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);tx(zx,439,&#x27;&#x27;+(z+1),M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);if(z){ln(8+z*784/6,8,8+z*784/6,22,ST,.6);ln(8+z*784/6,428,8+z*784/6,442,ST,.6)}}&#x27;ABCD&#x27;.split(&#x27;&#x27;).forEach(function(L,k){var zy=8+(k+.5)*434/4;tx(15,zy+4,L,M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;);tx(785,zy+4,L,M+&#x27;font-size:10px;fill:&#x27;+DM,0,&#x27;middle&#x27;)});
+if(eb){tx(38,48,eb,M+&#x27;font-size:11px;letter-spacing:1.4px;fill:&#x27;+A);tx(38,70,h,F+&#x27;font-weight:700;font-size:18px;fill:&#x27;+B)}
+var t=el(&#x27;g&#x27;,{});el(&#x27;rect&#x27;,{x:536,y:382,width:238,height:40,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.8},t);ln(536,402,774,402,DM,.6,0,t);ln(678,382,678,422,DM,.6,0,t);tx(542,396,&#x27;DWG &#x27;+dwg,M+&#x27;font-size:11px;fill:&#x27;+B,t);tx(684,396,&#x27;SHEET &#x27;+sh,M+&#x27;font-size:11px;fill:&#x27;+B,t);tx(542,416,&#x27;SCALE 1:1&#x27;,M+&#x27;font-size:11px;fill:&#x27;+ST,t);tx(684,416,&#x27;REV 5.5&#x27;,M+&#x27;font-size:11px;fill:&#x27;+ST,t);
+if(notes){tx(38,378,&#x27;NOTES&#x27;,M+&#x27;font-size:10px;letter-spacing:1.4px;fill:&#x27;+ST);notes.forEach(function(s,k){tx(38,392+k*13,s,M+&#x27;font-size:10.5px;fill:&#x27;+ST)})}}
+function E(t){t=Math.max(0,Math.min(1,t));return t&lt;.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2}
+chrome(&#x27;SHEET 5/5 — AGENTS · TWO PIPELINES&#x27;,&#x27;Every handoff loses detail. One agent with skills keeps it.&#x27;,&#x27;claude-5/agents&#x27;,&#x27;5/5&#x27;,[&#x27;1. MERGE AGENTS THAT ALWAYS RUN TOGETHER; CALL OTHERS AS TOOLS.&#x27;,&#x27;2. KEEP SUBAGENTS FOR PARALLEL WORK AND BLACK-BOX VERIFICATION.&#x27;,&#x27;3. FOLD ONE IN AT A TIME. TEST 10 GOLDEN CASES, EACH RUN TWICE.&#x27;]);
+function arrow(x1,y1,x2,y2,c){ln(x1,y1,x2,y2,c,.9);var a=Math.atan2(y2-y1,x2-x1),s=6;el(&#x27;polygon&#x27;,{points:[x2,y2,x2-s*Math.cos(a-.4),y2-s*Math.sin(a-.4),x2-s*Math.cos(a+.4),y2-s*Math.sin(a+.4)].join(&#x27;,&#x27;),fill:c})}
+function belt(y){ln(36,y,470,y,B,.8);ln(36,y+6,470,y+6,B,.8);for(var x=42;x&lt;470;x+=14)el(&#x27;circle&#x27;,{cx:x,cy:y+3,r:2.2,fill:C,stroke:ST,&#x27;stroke-width&#x27;:.6});return el(&#x27;line&#x27;,{x1:36,y1:y-3,x2:470,y2:y-3,stroke:DM,&#x27;stroke-width&#x27;:1,&#x27;stroke-dasharray&#x27;:&#x27;6 8&#x27;})}
+tx(38,98,&#x27;A · ORG-CHART PIPELINE&#x27;,M+&#x27;font-size:10.5px;letter-spacing:1.4px;fill:&#x27;+ST);
+var sx=[44,150,256,362];[&#x27;DATA PULLER&#x27;,&#x27;ANALYST&#x27;,&#x27;WRITER&#x27;,&#x27;CHECKER&#x27;].forEach(function(n,i){el(&#x27;rect&#x27;,{x:sx[i]+4,y:116,width:88,height:40,fill:&#x27;#0A0C0F&#x27;,opacity:.6});el(&#x27;rect&#x27;,{x:sx[i],y:112,width:88,height:40,fill:&#x27;#14171C&#x27;,stroke:B,&#x27;stroke-width&#x27;:.9});tx(sx[i]+44,136,n,M+&#x27;font-size:10px;font-weight:700;letter-spacing:.5px;fill:&#x27;+B,0,&#x27;middle&#x27;);if(i&lt;3)arrow(sx[i]+90,132,sx[i+1]-2,132,ST)});
+var bA=belt(170);
+tx(38,216,&#x27;B · ONE AGENT + SKILLS + REVIEWER&#x27;,M+&#x27;font-size:10.5px;letter-spacing:1.4px;fill:&#x27;+ST);
+el(&#x27;rect&#x27;,{x:48,y:232,width:256,height:52,fill:&#x27;#0A0C0F&#x27;,opacity:.6});el(&#x27;rect&#x27;,{x:44,y:228,width:256,height:52,fill:&#x27;#14171C&#x27;,stroke:A,&#x27;stroke-width&#x27;:1});tx(54,244,&#x27;AGENT&#x27;,M+&#x27;font-size:10.5px;font-weight:700;letter-spacing:1px;fill:&#x27;+A);
+[[&#x27;skills&#x27;,54,70],[&#x27;tools&#x27;,132,70],[&#x27;one window&#x27;,210,80]].forEach(function(b){el(&#x27;rect&#x27;,{x:b[1],y:252,width:b[2],height:20,fill:&#x27;none&#x27;,stroke:B,&#x27;stroke-width&#x27;:.7});tx(b[1]+b[2]/2,266,b[0],M+&#x27;font-size:10px;fill:&#x27;+B,0,&#x27;middle&#x27;)});
+var rv=el(&#x27;rect&#x27;,{x:360,y:224,width:92,height:42,fill:&#x27;#14171C&#x27;,stroke:B,&#x27;stroke-width&#x27;:.9});tx(406,240,&#x27;REVIEWER&#x27;,M+&#x27;font-size:10px;font-weight:700;letter-spacing:.5px;fill:&#x27;+B,0,&#x27;middle&#x27;);tx(406,254,&#x27;black-box&#x27;,M+&#x27;font-size:10px;fill:&#x27;+ST,0,&#x27;middle&#x27;);
+var ck=el(&#x27;polyline&#x27;,{points:&#x27;436,236 440,241 448,230&#x27;,fill:&#x27;none&#x27;,stroke:A,&#x27;stroke-width&#x27;:1.6,opacity:0});ln(406,266,406,288,ST,.7,&#x27;3 3&#x27;);arrow(302,254,358,248,ST);
+var bB=belt(300);
+function packet(g,x,y,keep,c){el(&#x27;rect&#x27;,{x:x-17,y:y-14,width:34,height:14,fill:&#x27;#14171C&#x27;,stroke:c,&#x27;stroke-width&#x27;:.9},g);for(var i=0;i&lt;6;i++){var tx0=x-15+i*5.4;if(keep[i])el(&#x27;rect&#x27;,{x:tx0,y:y-19,width:4,height:5,fill:c},g);else el(&#x27;rect&#x27;,{x:tx0,y:y-19,width:4,height:5,fill:&#x27;none&#x27;,stroke:DM,&#x27;stroke-width&#x27;:.6},g)}}
+var tagA=el(&#x27;g&#x27;,{opacity:0});tx(480,160,&#x27;DETAIL&#x27;,M+&#x27;font-size:10px;fill:&#x27;+ST,tagA);tx(480,173,&#x27;LOST 4/6&#x27;,M+&#x27;font-size:10.5px;font-weight:700;fill:&#x27;+ST,tagA);
+var tagB=el(&#x27;g&#x27;,{opacity:0});tx(480,290,&#x27;6/6 KEPT&#x27;,M+&#x27;font-size:10.5px;font-weight:700;fill:&#x27;+A,tagB);tx(480,303,&#x27;verified&#x27;,M+&#x27;font-size:10px;fill:&#x27;+A,tagB);
+var tb=el(&#x27;g&#x27;,{}),tx0=560,ty=100;el(&#x27;rect&#x27;,{x:tx0,y:ty,width:214,height:100,fill:&#x27;none&#x27;,stroke:ST,&#x27;stroke-width&#x27;:.8},tb);for(var r=1;r&lt;5;r++)ln(tx0,ty+r*20,tx0+214,ty+r*20,DM,.6,0,tb);ln(644,ty,644,ty+100,DM,.6,0,tb);ln(700,ty,700,ty+100,DM,.6,0,tb);
+[[&#x27;&#x27;,&#x27;A&#x27;,&#x27;B&#x27;],[&#x27;HANDOFFS&#x27;,&#x27;3&#x27;,&#x27;0&#x27;],[&#x27;CONTEXT&#x27;,&#x27;lossy&#x27;,&#x27;one window&#x27;],[&#x27;REVIEW&#x27;,&#x27;inline&#x27;,&#x27;black-box&#x27;],[&#x27;RUNTIME&#x27;,&#x27;base&#x27;,&#x27;~2× faster*&#x27;]].forEach(function(row,i){tx(566,ty+i*20+14,row[0],M+&#x27;font-size:10px;letter-spacing:.5px;fill:&#x27;+ST,tb);tx(650,ty+i*20+14,row[1],M+&#x27;font-size:10px;fill:&#x27;+(i?B:ST),tb);tx(706,ty+i*20+14,row[2],M+&#x27;font-size:10px;fill:&#x27;+(i?A:ST),tb)});
+tx(560,216,&#x27;* one customer, single loop&#x27;,M+&#x27;font-size:10px;fill:&#x27;+DM);
+tx(560,246,&#x27;KEEP A SUBAGENT FOR&#x27;,M+&#x27;font-size:10px;letter-spacing:1.4px;fill:&#x27;+ST);[&#x27;· parallel work, fresh context&#x27;,&#x27;· black-box verification&#x27;,&#x27;· measured context overload&#x27;].forEach(function(s,i){tx(560,264+i*15,s,M+&#x27;font-size:10.5px;fill:&#x27;+B)});
+var dyn=el(&#x27;g&#x27;,{}),loss=[[138,[5]],[244,[1,3]],[350,[4]]],chips=[],T=12000,t0=performance.now(),last=0;
+function frame(now){var t=(now-t0)%T/T;while(dyn.firstChild)dyn.removeChild(dyn.firstChild);bA.setAttribute(&#x27;stroke-dashoffset&#x27;,-(now/40)%14);bB.setAttribute(&#x27;stroke-dashoffset&#x27;,-(now/40)%14);
+if(t&lt;last)chips=[];last=t;var pa=E((t-.04)/.4),xa=40+430*pa,keep=[1,1,1,1,1,1];loss.forEach(function(L){if(xa&gt;L[0]){L[1].forEach(function(i){keep[i]=0;if(!chips.some(function(c){return c.i===i}))chips.push({i:i,x:L[0]-15+i*5.4,t:now})})}});
+if(t&lt;.9)packet(dyn,xa,168,keep,B);chips.forEach(function(c){var d=(now-c.t)/1000;if(d&gt;1.2)return;el(&#x27;rect&#x27;,{x:c.x+d*18,y:150+90*d*d,width:4,height:5,fill:B,opacity:(1-d/1.2).toFixed(2),transform:&#x27;rotate(&#x27;+(d*260)+&#x27; &#x27;+(c.x+2+d*18)+&#x27; &#x27;+(152+90*d*d)+&#x27;)&#x27;},dyn)});
+tagA.setAttribute(&#x27;opacity&#x27;,pa&gt;=1&amp;&amp;t&lt;.9?1:0);var pb=E((t-.48)/.36),xb=40+430*pb;if(t&gt;.46&amp;&amp;t&lt;.9)packet(dyn,xb,298,[1,1,1,1,1,1],A);var rvOn=xb&gt;400&amp;&amp;t&lt;.9;rv.setAttribute(&#x27;stroke&#x27;,rvOn?A:B);ck.setAttribute(&#x27;opacity&#x27;,rvOn?1:0);tagB.setAttribute(&#x27;opacity&#x27;,pb&gt;=1&amp;&amp;t&lt;.9?1:0);requestAnimationFrame(frame)}
+requestAnimationFrame(frame);
+&lt;/script&gt;&lt;/body&gt;&lt;/html&gt;" frameborder="0"></iframe>
+
+</section>
+</div><div class="slide" data-title="One agent with skills first" data-note="The org chart builds in on its own: data puller, analyst, writer, checker. Then click. This is the common mistake: turning the team structure into agents, where every handoff loses detail. Click again for the finding: a single agent with skills frequently beat both one giant prompt and a team of subagents. Frequently, not always. And click once more for when subagents still earn their place: measured context overload, parallel work that needs fresh context, or an agent with too many tools or clashing instructions."><section id="agents" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 5 · Agents</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">One agent with skills first</h2>
+<p data-build-in="left 1 auto" style="position:absolute;left:128px;top:330px;width:260px;font-size:28px;padding:20px 0;text-align:center;background:#DEDAD0;border-radius:12px;color:#50555F">Data puller</p>
+<x-shape data-build-in="fade 2 auto" kind="arrow-right" style="position:absolute;left:408px;top:354px;width:56px;height:28px;background:#7D838E"></x-shape>
+<p data-build-in="left 3 auto" style="position:absolute;left:484px;top:330px;width:260px;font-size:28px;padding:20px 0;text-align:center;background:#DEDAD0;border-radius:12px;color:#50555F">Analyst</p>
+<x-shape data-build-in="fade 4 auto" kind="arrow-right" style="position:absolute;left:764px;top:354px;width:56px;height:28px;background:#7D838E"></x-shape>
+<p data-build-in="left 5 auto" style="position:absolute;left:840px;top:330px;width:260px;font-size:28px;padding:20px 0;text-align:center;background:#DEDAD0;border-radius:12px;color:#50555F">Writer</p>
+<x-shape data-build-in="fade 6 auto" kind="arrow-right" style="position:absolute;left:1120px;top:354px;width:56px;height:28px;background:#7D838E"></x-shape>
+<p data-build-in="left 7 auto" style="position:absolute;left:1196px;top:330px;width:260px;font-size:28px;padding:20px 0;text-align:center;background:#DEDAD0;border-radius:12px;color:#50555F">Checker</p>
+<p data-build-in="fade 8" style="position:absolute;left:128px;top:440px;width:1400px;font-size:24px;color:#50555F">Avoid: an org chart turned into agents. Every handoff passes on a lossy summary.</p>
+<div data-build-in="rise 9" style="position:absolute;left:128px;top:520px;width:816px;display:flex;flex-direction:column;gap:16px;background:#0F1115;padding:44px;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600;color:#22D3EE">Often better</h3>
+<p style="font-size:28px;line-height:1.45;color:#ECE9E1">One agent with skills beat both one giant prompt and a team of subagents, often at lower cost. One customer ran ~2× faster.</p>
+</div>
+<div data-build-in="rise 10" style="position:absolute;left:976px;top:520px;width:816px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:44px;border:1px solid #CFCABE;border-radius:16px">
+<h3 style="font-size:32px;font-weight:600;color:#0F1115">Keep a subagent only for</h3>
+<ul style="font-size:28px;line-height:1.5;color:#0F1115">
+<li>Measured context overload</li>
+<li>Parallel work needing fresh context</li>
+<li>Too many tools or clashing instructions</li>
+</ul>
+</div>
+
+</section>
+</div><div class="slide" data-title="Verification is where subagents earn their place" data-note="Here is rule five at real scale. Anthropic’s monorepo went from about 2,500 changes a day in May to more than 30,000 in September, most of them written with Claude. The Claude Code team rebuilt review around that: automated checks and AI review first, humans for the risky calls. Substantive review comments went from 16 to 54 percent of PRs, and the average rounds to pass dropped from 2.08 to 1.32. They also turned past incidents and reverts into an eval set and score every reviewer change against it. For your repo, two concrete pieces: a read-only reviewer subagent that never saw how the code was written, and a Stop hook that won’t let Claude finish until the type check passes. That’s the subagent pattern that holds up: verification, not an org chart."><section id="ex-agents" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px 128px 160px;display:flex;flex-direction:column;gap:44px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 5 · Example at Anthropic scale</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Verification is where subagents earn their place</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#0E7490">30,000+</p>
+<p style="font-size:24px;line-height:1.4;color:#50555F">changes a day in Anthropic’s monorepo by September, up from ~2,500 in May</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#0E7490">54%</p>
+<p style="font-size:24px;line-height:1.4;color:#50555F">of internal PRs get substantive review comments, up from 16%</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px;background:#F5F3EE;padding:36px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:700;line-height:1;color:#0E7490">1.32</p>
+<p style="font-size:24px;line-height:1.4;color:#50555F">average review rounds to pass, down from 2.08</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:36px 40px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#22D3EE">.claude/agents/reviewer.md</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#ECE9E1">description: Use after implementing a feature, before opening the PR.<br>tools: Read, Grep, Glob</p>
+<p style="font-size:24px;color:#B8BCC8">Read-only reviewer with fresh context</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:36px 40px;border-radius:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;font-weight:600;color:#22D3EE">Stop hook</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;line-height:1.5;color:#ECE9E1">pnpm tsc --noEmit 1&gt;&amp;2 || exit 2</p>
+<p style="font-size:24px;color:#B8BCC8">Claude can’t finish until the type check passes</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1664px;font-size:24px;color:#50555F">Sources: “How the Claude Code team does code review” (claude.dev, Oct 2026); Claude Code docs, “Best practices”.</p>
+
+</section>
+</div><div class="slide" data-title="Test before you trust it" data-note="Before you trust a simpler setup, test it. The Applied AI post says even ten golden examples are enough to start. Run each one more than once: in their test, one breakage only showed up in one run out of two. And fold in one agent at a time. For balance: Anthropic’s own multi-agent research system shows where teams of agents do win, on broad parallel research, but at roughly fifteen times the token cost of a chat. It doesn’t suit work that shares context, or most coding."><section id="testing" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">Rule 5 · Agents</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Test before you trust it</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:44px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1;color:#0E7490">10</p>
+<p style="font-size:28px;line-height:1.4;color:#0F1115">golden examples are enough to start: past cases where you liked the output</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:44px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1;color:#0E7490">×2</p>
+<p style="font-size:28px;line-height:1.4;color:#0F1115">run each case at least twice; one break showed up in only 1 run of 2</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:44px;border:1px solid #CFCABE;border-radius:16px">
+<p style="font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1;color:#0E7490">1</p>
+<p style="font-size:28px;line-height:1.4;color:#0F1115">change at a time; check which cases flipped, not just the score</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:8px;background:#DEDAD0;padding:32px 44px;border-radius:16px">
+<p style="font-size:28px;line-height:1.4;color:#0F1115"><b>When multi-agent does win:</b> broad research with many independent directions. Anthropic’s research system beat a single agent by 90%, at about 15× the tokens of a chat.</p>
+</div>
+
+</section>
+</div><div class="slide" data-title="Your 30-minute setup audit" data-note="Here is something concrete to do this week. Pick one workflow you use every week and run through these ten checks. In the worked example behind this deck, a weekly client report went from four messages to one, its CLAUDE.md went from about 250 lines to 35, the skill from 400 always-loaded lines to 80 plus three on-demand files, and four agents became one plus a fact-checker called as a tool."><section id="audit" data-transition="fade" style="background:#DEDAD0;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px;display:flex;flex-direction:column;gap:56px">
+<div style="display:flex;flex-direction:column;gap:24px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#0E7490;font-weight:600">This week</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:72px;font-weight:600;line-height:1.1;color:#0F1115">Your 30-minute setup audit</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:64px">
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Rewrite one multi-step flow as a single brief</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Delete “double-check”, ALL CAPS and “IMPORTANT” lines</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Run /doctor; cut CLAUDE.md to gotchas, under 200 lines</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Find and resolve contradicting instructions</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Move skill reference material into linked files</p></div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Rewrite each skill description: what + when</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Default to medium; low for drafts, high to verify</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Check each agent against the three keep-cases</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Test on 10 past examples, each run twice</p></div>
+<div style="display:flex;flex-direction:row;gap:20px;align-items:start"><x-icon name="Check" style="color:#0E7490;width:36px;height:36px"></x-icon><p style="flex:1;font-size:28px;line-height:1.35;color:#0F1115">Repeat at the next model upgrade</p></div>
+</div>
+</div>
+
+</section>
+</div><div class="slide" data-title="close" data-note="The thread running through all five guides: the models got better, so Anthropic keeps deleting the structure it built for older ones. Each new model lets you move more of the decision-making out of your prompts, rules and agents and into the model itself. But not to zero: gotchas, parallel jobs and verification still earn their place. The focus document has more detail and links to every source."><section id="close" data-transition="fade" style="background:#0F1115;color:#ECE9E1;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p data-build-in="rise 1 auto" style="position:absolute;left:128px;top:150px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.1;letter-spacing:-2px;color:#ECE9E1">Your setup should shrink</p>
+<p data-build-in="rise 2 auto" style="position:absolute;left:128px;top:256px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.1;letter-spacing:-2px;color:#ECE9E1">with every model upgrade,</p>
+<p data-build-in="rise 3 auto" style="position:absolute;left:128px;top:362px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:96px;font-weight:700;line-height:1.1;letter-spacing:-2px;color:#22D3EE">but not to zero.</p>
+<p data-build-in="fade 4 auto" style="position:absolute;left:128px;top:530px;width:1400px;font-size:32px;line-height:1.4;color:#B8BCC8">Keep the gotchas, the parallel jobs and the verification. Delete the rest.</p>
+<div data-build-in="fade 5 auto" style="position:absolute;left:128px;top:660px;width:1664px;display:flex;flex-direction:column;gap:8px">
+<p style="font-size:24px;font-weight:600;color:#B8BCC8">Sources</p>
+<p style="font-size:24px;line-height:1.5;color:#B8BCC8">1 · <a href="https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5-5"><span style="color:#ECE9E1">Prompting Claude Opus 5.5</span></a> (Anthropic docs) · <a href="https://code.claude.com/docs/en/best-practices"><span style="color:#ECE9E1">Best practices for Claude Code</span></a><br>2 · <a href="https://claude.com/blog/the-new-rules-of-context-engineering-for-claude-5-generation-models"><span style="color:#ECE9E1">The new rules of context engineering</span></a> (Thariq Shihipar) · <a href="https://code.claude.com/docs/en/large-codebases"><span style="color:#ECE9E1">Claude Code in large codebases</span></a><br>3 · <a href="https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices"><span style="color:#ECE9E1">Skill authoring best practices</span></a> (Anthropic docs)<br>4 · <a href="https://claude.com/blog/claude-model-and-effort-level-in-claude-code"><span style="color:#ECE9E1">Choosing a model and effort level</span></a> (Lydia Hallie) · <a href="https://claude.dev/blog/spending-your-effort"><span style="color:#ECE9E1">Spending your effort</span></a> (Thariq Shihipar)<br>5 · <a href="https://claude.com/blog/building-agents-when-to-fold-subagents-into-your-main-agent-loop"><span style="color:#ECE9E1">When to fold subagents into your main agent loop</span></a> (Diane Sarkis) · <a href="https://claude.dev/blog/solving-code-review-at-anthropic/"><span style="color:#ECE9E1">How the Claude Code team does code review</span></a></p>
+</div>
+
+</section>
+</div><div class="slide" data-title="beyond" data-note="That’s the end of the five rules. What follows is a short chapter of our own, outside that scope: how to structure Claude around a codebase our size, with hundreds of thousands of source files. It comes from a question our team keeps asking. If the new guidance says to delete diary notes, do per-module design docs still make sense? Five slides answer it: why diary notes and design docs are different things, what a good module CLAUDE.md contains, how to lay them out at scale, how deep they should go, and when to update them and who approves. To be clear, these are our recommendations built on how Claude Code loads files, not part of Anthropic’s guidance."><section id="beyond" data-transition="fade" style="background:#0F1115;color:#ECE9E1;font-family:'IBM Plex Sans', Arial, sans-serif;padding:128px">
+<p style="position:absolute;left:128px;top:200px;width:1664px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:26px;letter-spacing:4px;text-transform:uppercase;color:#7D838E;font-weight:600">Beyond the scope of the 5 rules</p>
+<p data-build-in="rise 1 auto" style="position:absolute;left:128px;top:250px;width:1664px;font-family:'Space Grotesk', Arial, sans-serif;font-size:120px;font-weight:700;line-height:1.05;letter-spacing:-3px;color:#ECE9E1">Additional thoughts</p>
+<p data-build-in="fade 2 auto" style="position:absolute;left:128px;top:410px;width:1400px;font-size:36px;line-height:1.4;color:#B8BCC8">Structuring Claude around a real-time codebase with 100K+ source files.</p>
+<div data-build-in="fade 3 auto" style="position:absolute;left:128px;top:560px;width:1664px;display:flex;flex-direction:row;gap:24px">
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:3px solid #3A404B;padding-top:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7D838E">A</p>
+<p style="font-size:27px;font-weight:600;line-height:1.25;color:#ECE9E1">Delete the diary. Keep the design.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:3px solid #3A404B;padding-top:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7D838E">B</p>
+<p style="font-size:27px;font-weight:600;line-height:1.25;color:#ECE9E1">What goes in a module CLAUDE.md</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:3px solid #3A404B;padding-top:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7D838E">C</p>
+<p style="font-size:27px;font-weight:600;line-height:1.25;color:#ECE9E1">One per module, at scale, kept true</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:3px solid #3A404B;padding-top:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7D838E">D</p>
+<p style="font-size:27px;font-weight:600;line-height:1.25;color:#ECE9E1">How deep to go</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px;border-top:3px solid #3A404B;padding-top:20px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;color:#7D838E">E</p>
+<p style="font-size:27px;font-weight:600;line-height:1.25;color:#ECE9E1">When to update, and who</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:80px;width:1664px;font-size:24px;color:#7D838E">Our own recommendations, built on the Claude Code docs. Not one of Anthropic’s five rules.</p>
+
+</section>
+</div><div class="slide" data-title="Delete the diary. Keep the design." data-note="This is the distinction behind the “diary notes” row in Rule 2, and it matters a lot in a codebase our size. Diary notes are session history: what you fixed yesterday, what to do next time, what you tried and reverted. They go stale in days, and Claude Code’s auto-memory now keeps the useful parts on its own. So delete them from CLAUDE.md. A module design summary is a different thing: why the module is built the way it is, its timing and threading invariants, what must not change. That stays true as long as the design does, and Claude cannot recover it from the source. And auto-memory is no substitute: it lives on each engineer’s machine, it never goes through review, and it only knows what came up in that person’s sessions. It will never learn the rationale from the engineer who left two years ago. Team knowledge belongs in the repo."><section id="diary-vs-design" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 140px;display:flex;flex-direction:column;gap:32px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#50555F;font-weight:600">Additional thoughts · A · Diary vs. design</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:64px;font-weight:600;line-height:1.1;color:#0F1115">Delete the diary. Keep the design.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:30px 36px;border:1px solid #CFCABE;border-top:6px solid #BE123C;border-radius:14px">
+<h3 style="font-size:26px;font-weight:600;color:#BE123C">Diary notes: delete</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;line-height:1.6;color:#50555F"><s>Nov 3: fixed resume dropout, recheck device.cpp</s><br><s>Next session: finish the ring_buffer migration</s><br><s>Tried lock-free queue v2, reverted, see later</s></p>
+<p style="font-size:23px;line-height:1.4;color:#0F1115">Session history. Stale within days. Claude Code’s auto-memory now keeps what matters, for each engineer.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:30px 36px;border:1px solid #CFCABE;border-top:6px solid #15803D;border-radius:14px">
+<h3 style="font-size:26px;font-weight:600;color:#15803D">Module design summary: keep</h3>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;line-height:1.6;color:#0F1115">Mixer runs on the audio thread: process() &lt; 0.5 ms<br>Channel changes arrive via spsc_ring, never resized<br>legacy/old_mixer.cpp stays: v3 plugin ABI</p>
+<p style="font-size:23px;line-height:1.4;color:#0F1115">Design intent. True as long as the design is. Claude can’t read it from the code.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:26px 36px;border-radius:14px">
+<p style="font-size:24px;font-weight:600;color:#E9E6DE">Why auto-memory can’t replace design docs</p>
+<div style="display:flex;flex-direction:row;gap:32px">
+<p style="flex:1;font-size:22px;line-height:1.4;color:#B8BCC8"><b style="color:#A78BFA">Per person.</b> Stored on each engineer’s machine, not in the repo.</p>
+<p style="flex:1;font-size:22px;line-height:1.4;color:#B8BCC8"><b style="color:#A78BFA">Never reviewed.</b> It doesn’t go through a PR.</p>
+<p style="flex:1;font-size:22px;line-height:1.4;color:#B8BCC8"><b style="color:#A78BFA">Knows only its own sessions.</b> Not the rationale from the engineer who left.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:22px;color:#50555F">Team knowledge belongs in the repo. Source: Claude Code docs, “How Claude remembers your project”. Examples are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="Write the intent. Claude reads the code itself." data-note="Here is what a module design summary should look like. Sixteen lines for the mixer, and every one is something Claude can’t get by reading mixer.h. Invariants: the timing budget and the rule that channel changes come through the ring buffer; you can’t see a 0.5 millisecond budget in the source. Why: per-sample gain smoothing exists because per-block caused zipper noise; without that line, Claude may well simplify it back into the bug. Don’t: the legacy mixer looks dead but must stay for the plugin ABI. Verify: how Claude checks its own work here. What’s left out matters as much. No list of classes and methods: Claude reads the header better than a summary describes it, and when the summary goes stale, Claude trusts the wrong thing. The test for every line is simple: could Claude learn this from the headers and tests? If yes, delete it."><section id="module-md" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 130px;display:flex;flex-direction:column;gap:30px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#7D838E;font-weight:600">Additional thoughts · B · Module CLAUDE.md</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">Write the intent. Claude reads the code itself.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:36px">
+<div style="width:860px;display:flex;flex-direction:column;gap:12px;background:#14171C;padding:24px 30px;border:1px solid #3A404B;border-radius:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:21px;color:#A78BFA">src/rt/mixer/CLAUDE.md</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;line-height:1.45;color:#E9E6DE"><span style="color:#7D838E"># Mixer</span><br>Sums N input streams into the output bus.<br>Audio thread: RT rules apply. Entry: Mixer::process().<br><br><span style="color:#22D3EE">## Invariants</span><br>- process() &lt; 0.5 ms at 48 kHz / 64 frames<br>&nbsp;&nbsp;(measure: tools/bench_mixer)<br>- Channel changes arrive via spsc_ring;<br>&nbsp;&nbsp;never resized inside process()<br><span style="color:#22D3EE">## Why</span><br>- Gain is smoothed per sample, not per block:<br>&nbsp;&nbsp;per-block caused zipper noise<br><span style="color:#22D3EE">## Don’t</span><br>- Remove legacy/old_mixer.cpp: v3 plugin ABI<br><span style="color:#22D3EE">## Verify</span><br>- ctest -L mixer</p>
+<p style="font-size:19px;color:#7D838E">16 lines. Aim for 10 to 30.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;letter-spacing:3px;text-transform:uppercase;color:#7D838E">Why each part is there</p>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #22D3EE;border-radius:6px">
+<p style="font-size:22px;font-weight:600;color:#E9E6DE">Invariants</p>
+<p style="font-size:20px;color:#B8BCC8">Timing budgets and thread ownership aren’t visible in the source.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #22D3EE;border-radius:6px">
+<p style="font-size:22px;font-weight:600;color:#E9E6DE">Why</p>
+<p style="font-size:20px;color:#B8BCC8">Stops Claude from “simplifying” a choice back into the old bug.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #22D3EE;border-radius:6px">
+<p style="font-size:22px;font-weight:600;color:#E9E6DE">Don’t</p>
+<p style="font-size:20px;color:#B8BCC8">Code that looks dead but must stay.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#14171C;padding:14px 20px;border-left:4px solid #22D3EE;border-radius:6px">
+<p style="font-size:22px;font-weight:600;color:#E9E6DE">Verify</p>
+<p style="font-size:20px;color:#B8BCC8">How Claude checks its own work in this module.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#2A1218;padding:14px 20px;border-left:4px solid #FB7185;border-radius:6px">
+<p style="font-size:22px;font-weight:600;color:#FB7185">Leave out</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:17px;color:#B8BCC8"><s>class Mixer has process(), add_channel() …</s></p>
+<p style="font-size:20px;color:#B8BCC8">Claude reads mixer.h better than a summary describes it. A stale description is worse than none.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:52px;width:1664px;font-size:21px;color:#7D838E">Test for every line: could Claude learn this by reading the headers and tests? If yes, delete it. File contents are illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="One CLAUDE.md per module. It loads only there." data-note="How this scales to a repository with hundreds of thousands of files. One CLAUDE.md per module boundary, not per folder. The root file holds build commands and repo-wide rules; the real-time rules live in a path-scoped rule. Each module’s CLAUDE.md loads only when Claude reads files in that module. So when someone asks why the mixer drops samples under load, Claude opens mixer.cpp and has exactly three files of guidance in context: the root CLAUDE.md, the RT rules and the mixer’s own file. Networking, UI, DSP and device notes cost nothing. Third-party code gets none. On the right, how to keep them true. Choose the granularity by asking whether a new senior engineer would need to be told. If you already maintain DESIGN.md files, don’t duplicate them: a short one can be imported with an at-sign, and a long one should just be mentioned by path, as the next slide shows. Claude drafts updates in the same change as a design change, and the module owner approves them; slide E covers that. And run /doctor prompt-audit regularly to catch stale instructions and references to files that no longer exist."><section id="module-scale" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 140px;display:flex;flex-direction:column;gap:30px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#50555F;font-weight:600">Additional thoughts · C · At 100K files</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#0F1115">One CLAUDE.md per module. It loads only there.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="width:900px;display:flex;flex-direction:column;gap:14px;background:#0F1115;padding:26px 32px;border-radius:14px">
+<div style="display:flex;flex-direction:row;gap:24px">
+<p style="width:470px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;line-height:1.55;color:#E9E6DE">repo/<br>├─ <span style="color:#4ADE80">CLAUDE.md</span><br>├─ .claude/rules/<span style="color:#4ADE80">rt.md</span><br>├─ src/<br>│&nbsp;&nbsp;├─ rt/<br>│&nbsp;&nbsp;│&nbsp;&nbsp;├─ mixer/<span style="color:#4ADE80">CLAUDE.md</span><br>│&nbsp;&nbsp;│&nbsp;&nbsp;├─ device/<span style="color:#7D838E">CLAUDE.md</span><br>│&nbsp;&nbsp;│&nbsp;&nbsp;└─ dsp/<span style="color:#7D838E">CLAUDE.md</span><br>│&nbsp;&nbsp;├─ net/<span style="color:#7D838E">CLAUDE.md</span><br>│&nbsp;&nbsp;└─ ui/<span style="color:#7D838E">CLAUDE.md</span><br>└─ third_party/</p>
+<p style="flex:1;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;line-height:1.55;color:#4ADE80">&nbsp;<br>● build, repo-wide rules<br>● RT-1..RT-5<br>&nbsp;<br>&nbsp;<br>● mixer intent<br>&nbsp;<br>&nbsp;<br>&nbsp;<br>&nbsp;<br><span style="color:#7D838E">no CLAUDE.md</span></p>
+</div>
+<div style="display:flex;flex-direction:column;gap:6px;background:#0F2A1A;padding:14px 20px;border-left:4px solid #4ADE80;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#E9E6DE">&gt; mixer drops samples under load</p>
+<p style="font-size:21px;line-height:1.4;color:#B8BCC8">Claude opens src/rt/mixer/mixer.cpp. In context: <span style="color:#4ADE80">● the three green files.</span> Not net/, ui/, dsp/ or device/.</p>
+</div>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:14px">
+<p style="font-size:22px;letter-spacing:3px;text-transform:uppercase;color:#50555F;font-weight:600">Keep them true</p>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 20px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:22px;font-weight:600;color:#0F1115">Module boundary, not every folder</p>
+<p style="font-size:20px;line-height:1.35;color:#50555F">Would a new senior engineer need to be told this?</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 20px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:22px;font-weight:600;color:#0F1115">One copy for people and Claude</p>
+<p style="font-size:20px;line-height:1.35;color:#50555F">Short DESIGN.md? Import it: <span style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#6D28D9">@DESIGN.md</span>. Long one? Mention its path (slide D).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 20px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:22px;font-weight:600;color:#0F1115">Same PR as the design change</p>
+<p style="font-size:20px;line-height:1.35;color:#50555F">Claude drafts the update, the module owner approves (slide E).</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 20px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:22px;font-weight:600;color:#0F1115">Audit regularly</p>
+<p style="font-size:20px;line-height:1.35;color:#50555F"><span style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#6D28D9">/doctor prompt-audit</span> flags stale instructions and references to missing files.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:56px;width:1664px;font-size:22px;color:#50555F">A subfolder CLAUDE.md loads when Claude reads files in that folder. Source: Claude Code docs, “How Claude remembers your project”. Tree is illustrative.</p>
+
+</section>
+</div><div class="slide" data-title="As deep as what Claude would get wrong. No deeper." data-note="The first big question: how deep should a design file go? The answer is a test, not a number: as deep as what Claude would get wrong after reading the code, and no deeper. That splits the knowledge into four levels. The system level, the module map and which thread owns what, goes in the root CLAUDE.md, about ten lines. The module level is what we saw on slide B: intent, invariants, why, don’t, verify, ten to thirty lines. Function-level reasons belong in a comment next to the code, not in markdown. And the full design rationale, with history and measurements, can be as long as you like, as long as it doesn’t load every time. That is the important detail at the bottom. An at-sign import loads the whole file every time the module’s CLAUDE.md loads, which is fine for twenty lines and wasteful for fifteen pages. For a long design doc, just mention its path and say when to read it; Claude reads it only when the task needs it."><section id="module-depth" data-transition="fade" style="background:#0F1115;color:#E9E6DE;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 130px;display:flex;flex-direction:column;gap:30px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:24px;letter-spacing:3px;text-transform:uppercase;color:#7D838E;font-weight:600">Additional thoughts · D · How deep</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:56px;font-weight:600;line-height:1.1;color:#E9E6DE">As deep as what Claude would get wrong. No deeper.</h2>
+</div>
+<div style="display:flex;flex-direction:column;background:#14171C;border:1px solid #3A404B;border-radius:12px;padding:8px 28px">
+<div style="display:flex;flex-direction:row;gap:24px;padding:12px 0;border-bottom:1px solid #3A404B;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:18px;letter-spacing:2px;text-transform:uppercase;color:#7D838E">
+<p style="width:200px">Level</p><p style="width:640px">What goes there</p><p style="width:440px">Where</p><p style="flex:1">Size</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:14px 0;border-bottom:1px solid #22262E;font-size:23px">
+<p style="width:200px;font-weight:600;color:#A78BFA">System</p><p style="width:640px;color:#E9E6DE">Module map, thread ownership, data flow between modules</p><p style="width:440px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#B8BCC8">root CLAUDE.md</p><p style="flex:1;color:#B8BCC8">~10 lines</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:14px 0;border-bottom:1px solid #22262E;font-size:23px">
+<p style="width:200px;font-weight:600;color:#A78BFA">Module</p><p style="width:640px;color:#E9E6DE">Intent, invariants, why, don’t, verify</p><p style="width:440px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#B8BCC8">src/rt/mixer/CLAUDE.md</p><p style="flex:1;color:#B8BCC8">10–30 lines</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:14px 0;border-bottom:1px solid #22262E;font-size:23px">
+<p style="width:200px;font-weight:600;color:#A78BFA">Function</p><p style="width:640px;color:#E9E6DE">Why this loop is unrolled, why this ordering</p><p style="width:440px;color:#B8BCC8">A comment next to the code</p><p style="flex:1;color:#B8BCC8">1–3 lines</p>
+</div>
+<div style="display:flex;flex-direction:row;gap:24px;padding:14px 0;font-size:23px">
+<p style="width:200px;font-weight:600;color:#A78BFA">Rationale</p><p style="width:640px;color:#E9E6DE">Full design, history, measurements</p><p style="width:440px;font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#B8BCC8">docs/mixer-design.md</p><p style="flex:1;color:#B8BCC8">Any. Read on demand.</p>
+</div>
+</div>
+<div style="display:flex;flex-direction:row;gap:28px">
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#2A1218;padding:16px 24px;border-left:4px solid #FB7185;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#E9E6DE">@docs/mixer-design.md</p>
+<p style="font-size:21px;line-height:1.4;color:#B8BCC8"><b style="color:#FB7185">Import:</b> loads every time this CLAUDE.md loads. Fine for 20 lines, not for 15 pages.</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:8px;background:#0F2A1A;padding:16px 24px;border-left:4px solid #4ADE80;border-radius:6px">
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:20px;color:#E9E6DE">Full rationale: docs/mixer-design.md.<br>Read it before changing the threading model.</p>
+<p style="font-size:21px;line-height:1.4;color:#B8BCC8"><b style="color:#4ADE80">Mention:</b> Claude reads it only when the task needs it.</p>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:52px;width:1664px;font-size:21px;color:#7D838E">Over 30 lines? It’s probably describing the code. Keep a line only if Claude would get it wrong after reading the headers and tests.</p>
+
+</section>
+</div><div class="slide" data-title="Update it when a line becomes wrong. Claude proposes, a human approves." data-note="The second big question: when should a module file be updated, and can Claude do it without a human? Update it when a change makes one of its lines wrong or leaves something out. A changed timing budget, a change in which thread owns the mixer, a new path with its own constraint, or a Don’t that no longer applies: all yes. A new method inside the existing design, a refactor or a bug fix that keeps the invariants: no update. As for who: Claude should draft the update itself, in the same change, but a human approves it. Four pieces make that work. One line in the root CLAUDE.md tells Claude when to update and what not to write. CODEOWNERS makes the module owner approve every edit to that file. Optionally, a small design-check skill compares the branch diff with the touched modules’ files before the PR goes up. And /doctor prompt-audit each release catches the rest. Why not let Claude commit it alone? Because every future session trusts that file. Auto-memory is private, so Claude can write it alone. A module CLAUDE.md is team knowledge, so it’s reviewed like code."><section id="module-update" data-transition="fade" style="background:#ECE9E1;color:#0F1115;font-family:'IBM Plex Sans', Arial, sans-serif;padding:112px 128px 140px;display:flex;flex-direction:column;gap:28px">
+<div style="display:flex;flex-direction:column;gap:16px">
+<p style="font-size:24px;letter-spacing:4px;text-transform:uppercase;color:#50555F;font-weight:600">Additional thoughts · E · Keeping it true</p>
+<h2 style="font-family:'Space Grotesk', Arial, sans-serif;font-size:52px;font-weight:600;line-height:1.1;color:#0F1115">Update it when a line becomes wrong.<br>Claude proposes, a human approves.</h2>
+</div>
+<div style="display:flex;flex-direction:row;gap:32px">
+<div style="width:720px;display:flex;flex-direction:column;gap:16px;background:#F5F3EE;padding:26px 30px;border:1px solid #CFCABE;border-radius:12px">
+<p style="font-size:20px;letter-spacing:3px;text-transform:uppercase;color:#50555F;font-weight:600">Does this change need an update?</p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#15803D">Yes</b> · process() budget 0.5 → 0.3 ms <span style="color:#50555F">(invariant)</span></p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#15803D">Yes</b> · Mixer moves off the audio thread <span style="color:#50555F">(ownership)</span></p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#15803D">Yes</b> · New 96 kHz path with its own budget <span style="color:#50555F">(new constraint)</span></p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#15803D">Yes</b> · old_mixer.cpp finally removed <span style="color:#50555F">(a Don’t goes)</span></p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#BE123C">No</b> · New add_send() within the existing design</p>
+<p style="font-size:25px;line-height:1.4;color:#0F1115"><b style="color:#BE123C">No</b> · Refactor, rename or bug fix that keeps the invariants</p>
+</div>
+<div style="flex:1;display:flex;flex-direction:column;gap:10px">
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 22px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">1 · Trigger, in the root CLAUDE.md</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;line-height:1.45;color:#6D28D9">If your change alters an invariant, budget, thread owner or Don’t in a module CLAUDE.md, update it in the same change and say so. Never add code descriptions.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 22px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">2 · Gate, in CODEOWNERS</p>
+<p style="font-family:'JetBrains Mono', 'Courier New', monospace;font-size:19px;color:#6D28D9">src/rt/mixer/CLAUDE.md&nbsp;&nbsp;&lt;mixer owners&gt;</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 22px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">3 · Drift check, optional</p>
+<p style="font-size:22px;line-height:1.4;color:#50555F">A design-check skill compares the branch diff with the touched modules’ CLAUDE.md and proposes edits before the PR.</p>
+</div>
+<div style="display:flex;flex-direction:column;gap:4px;background:#F5F3EE;padding:14px 22px;border:1px solid #CFCABE;border-radius:10px">
+<p style="font-size:24px;font-weight:600;color:#0F1115">4 · Audit, every release</p>
+<p style="font-size:22px;line-height:1.4;color:#50555F"><span style="font-family:'JetBrains Mono', 'Courier New', monospace;color:#6D28D9">/doctor prompt-audit</span> catches what slipped through.</p>
+</div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:52px;width:1664px;font-size:22px;line-height:1.4;color:#50555F"><b style="color:#0F1115">Why not let Claude commit it alone?</b> Every future session trusts this file. Auto-memory is private, so Claude writes it alone; a module CLAUDE.md is shared, so it’s reviewed.</p>
+
+</section>
+</div></div><div id="notes"></div><div id="bar"><button id="prev">&larr;</button><button id="next">&rarr;</button><span class="t" id="t"></span><span>&larr; &rarr; move · N notes · F full screen</span><button id="nb">Notes</button><button id="fs">Full screen</button></div><script>
+var S=[].slice.call(document.querySelectorAll('.slide')),cur=0,st=document.getElementById('stage');
+function fit(){var k=Math.min(innerWidth/1920,innerHeight/1080);st.style.transform='scale('+k+') translate(-50%,-50%)'}
+function builds(el){var b=[].slice.call(el.querySelectorAll('[data-build-in]'));b.forEach(function(e){e.classList.remove('in','done')});
+ b.sort(function(a,c){return (+a.getAttribute('data-build-in').split(' ')[1])-(+c.getAttribute('data-build-in').split(' ')[1])});
+ b.forEach(function(e,i){setTimeout(function(){e.classList.add('in')},250+i*260);setTimeout(function(){e.classList.add('done')},950+i*260)})}
+function go(n){n=Math.max(0,Math.min(S.length-1,n));S[cur].classList.remove('on');cur=n;var s=S[n];s.classList.add('on');builds(s);
+ document.getElementById('t').textContent=(n+1)+' / '+S.length+'  ·  '+s.dataset.title;document.getElementById('notes').textContent=s.dataset.note||'(no notes)';
+ history.replaceState(null,'','#'+(n+1))}
+addEventListener('keydown',function(e){var k=e.key;
+ if(k=='ArrowRight'||k=='PageDown'||k==' '){go(cur+1);e.preventDefault()}
+ else if(k=='ArrowLeft'||k=='PageUp'){go(cur-1);e.preventDefault()}
+ else if(k=='Home')go(0);else if(k=='End')go(S.length-1);
+ else if(k=='n'||k=='N')document.body.classList.toggle('shownotes');
+ else if(k=='f'||k=='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()}});
+document.getElementById('prev').onclick=function(){go(cur-1)};document.getElementById('next').onclick=function(){go(cur+1)};
+document.getElementById('nb').onclick=function(){document.body.classList.toggle('shownotes')};
+document.getElementById('fs').onclick=function(){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen()};
+addEventListener('resize',fit);fit();go(Math.max(0,(parseInt(location.hash.slice(1))||1)-1));
+</script></body></html>
